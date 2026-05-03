@@ -1,20 +1,24 @@
 [
-    {
-        "name": "Downtown Hub",
-        "hub_name": "Downtown Hub",
-        "location": "123 Main Street, City Center",
-        "operating_hours_start": "06:00:00",
-        "operating_hours_end": "22:00:00",
-        "doctype": "Hub",
-        "disabled": 0
-    },
-    {
-        "name": "Airport Hub",
-        "hub_name": "Airport Hub",
-        "location": "Terminal 2, International Airport",
-        "operating_hours_start": "06:00:00",
-        "operating_hours_end": "22:00:00",
-        "doctype": "Hub",
-        "disabled": 0
-    }
+ {
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Hub",
+  "hub_name": "Downtown Hub",
+  "location": "123 Main Street, City Center",
+  "modified": "2026-05-04 00:16:12.108080",
+  "name": "Downtown Hub",
+  "operating_hours_end": "22:00:00",
+  "operating_hours_start": "6:00:00"
+ },
+ {
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Hub",
+  "hub_name": "Airport Hub",
+  "location": "Terminal 2, International Airport",
+  "modified": "2026-05-04 00:16:12.121583",
+  "name": "Airport Hub",
+  "operating_hours_end": "22:00:00",
+  "operating_hours_start": "6:00:00"
+ }
 ]
