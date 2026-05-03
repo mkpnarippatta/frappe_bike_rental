@@ -7,12 +7,38 @@ from bike_rental.api.availability import check_availability
 
 
 def get_context(context):
-    """Build bike detail page context."""
+    """Build bike listing or detail page context."""
     model_name = frappe.form_dict.get("name")
 
     if not model_name:
-        context.title = _("Bike Not Found")
+        # Show all bikes (listing view)
+        context.title = _("Available Bikes")
+        models = frappe.get_all(
+            "Bike Model",
+            fields=["name", "brand", "category", "base_rate_daily", "image"],
+            order_by="name asc",
+        )
+        enriched = []
+        for m in models:
+            serials = frappe.get_all(
+                "Bike Serial",
+                fields=["hub"],
+                filters={"bike_model": m.name, "status": ["!=", "Scrapped"]},
+            )
+            hub_counts = {}
+            for s in serials:
+                hub_counts[s.hub] = hub_counts.get(s.hub, 0) + 1
+            m.total_serials = len(serials)
+            m.hubs = list(hub_counts.keys())
+            enriched.append(m)
+        context.models = enriched
+        context.models_json = frappe.as_json(enriched)
         context.bike = None
+
+        categories = frappe.get_all(
+            "Bike Model", fields=["category"], distinct=True, order_by="category asc"
+        )
+        context.categories = [c["category"] for c in categories if c["category"]]
         return context
 
     bike = frappe.get_all(
