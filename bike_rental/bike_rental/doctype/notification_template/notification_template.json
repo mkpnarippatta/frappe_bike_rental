@@ -1,0 +1,104 @@
+{
+ "autoname": "Prompt",
+ "creation": "2026-05-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "event",
+  "channel",
+  "hub",
+  "subject",
+  "message",
+  "enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "event",
+   "fieldtype": "Select",
+   "label": "Event",
+   "options": "Booking Confirmation\nCheck-Out Reminder\nCheck-In Reminder\nKYC Status Change\nCancellation Confirmation\nDeposit Release\nBooking Extension\nMaintenance Alert\nPayment Receipt",
+   "reqd": 1
+  },
+  {
+   "fieldname": "channel",
+   "fieldtype": "Select",
+   "label": "Channel",
+   "options": "Email\nSMS\nIn-App",
+   "reqd": 1
+  },
+  {
+   "fieldname": "hub",
+   "fieldtype": "Link",
+   "label": "Hub",
+   "options": "Hub"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject",
+   "reqd": 1
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Text Editor",
+   "label": "Message",
+   "reqd": 1
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": 1
+  }
+ ],
+ "permissions": [
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 0,
+   "if_owner": 0,
+   "import": 0,
+   "permlevel": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Manager",
+   "select": 1,
+   "set_user_permissions": 0,
+   "share": 1,
+   "submit": 0,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 0,
+   "import": 1,
+   "permlevel": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "set_user_permissions": 0,
+   "share": 1,
+   "submit": 0,
+   "write": 1
+  }
+ ],
+ "quick_entry": 0,
+ "search_fields": "event, hub, channel",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "event",
+ "track_changes": 0,
+ "name": "Notification Template",
+ "module": "Bike Rental"
+}

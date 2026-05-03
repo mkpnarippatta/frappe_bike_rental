@@ -1,0 +1,27 @@
+{
+ "doctype": "Report",
+ "name": "Maintenance Overview",
+ "module": "Bike Rental",
+ "is_standard": "No",
+ "script": true,
+ "report_script": true,
+ "ref_doctype": "Maintenance Log",
+ "report_name": "Maintenance Overview",
+ "report_type": "Script Report",
+ "filters": [
+  {
+   "fieldname": "hub",
+   "fieldtype": "Link",
+   "label": "Hub",
+   "options": "Hub",
+   "mandatory": 0
+  },
+  {
+   "fieldname": "min_days",
+   "fieldtype": "Int",
+   "label": "Min Days in Maintenance",
+   "mandatory": 0,
+   "default": 0
+  }
+ ]
+}

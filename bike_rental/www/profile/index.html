@@ -1,0 +1,197 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+    .kyc-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .kyc-verified { background: #d1fae5; color: #065f46; }
+    .kyc-unverified { background: #f3f4f6; color: #6b7280; }
+    .kyc-pending { background: #fef3c7; color: #92400e; }
+    .kyc-rejected { background: #fef2f2; color: #991b1b; }
+    .dashboard-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        background: white;
+    }
+    .action-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        text-align: center;
+    }
+    @media (max-width: 640px) {
+        .dash-layout { grid-template-columns: 1fr !important; }
+    }
+</style>
+
+<div style="max-width: 1000px; margin: 0 auto; padding: 32px 16px;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 style="margin: 0; font-size: 22px;">Dashboard</h1>
+            <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Welcome back, {{ user_name }}</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <a href="/" class="action-btn" style="background: #00A040; color: white;">Browse Bikes</a>
+            <a href="/?cmd=logout" class="action-btn" style="border: 1px solid #d1d5db; color: #374151;">Log Out</a>
+        </div>
+    </div>
+
+    <div class="dash-layout" style="display: grid; grid-template-columns: 300px 1fr; gap: 24px;">
+        <!-- Left Sidebar -->
+        <div>
+            <!-- Profile Card -->
+            <div class="dashboard-card" style="margin-bottom: 16px;">
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #00A040; color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; margin: 0 auto 8px;">
+                        {{ user_name[0]|upper }}
+                    </div>
+                    <h3 style="margin: 0 0 4px 0; font-size: 16px;">{{ customer_name or user_name }}</h3>
+                    <span class="kyc-badge kyc-{{ kyc_status.lower().replace(' ', '-') if kyc_status in ['Verified', 'Unverified', 'Pending Review', 'Rejected'] else 'unverified' }}">
+                        {{ kyc_status }}
+                    </span>
+                </div>
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 12px;">
+                    <p style="font-size: 12px; color: #9ca3af; margin: 0 0 2px 0;">{{ user_email }}</p>
+                    {% if mobile %}
+                    <p style="font-size: 12px; color: #9ca3af; margin: 0;">{{ mobile }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <h4 style="margin: 0 0 12px 0; font-size: 14px;">Quick Actions</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="/" class="action-btn" style="background: #00A040; color: white; font-size: 13px;">Book a Bike</a>
+                    <a href="/profile" class="action-btn" style="border: 1px solid #d1d5db; color: #374151; font-size: 13px;">View All Bookings</a>
+                    {% if kyc_status != "Verified" %}
+                    <a href="#" class="action-btn" style="border: 1px solid #fef3c7; color: #92400e; font-size: 13px; background: #fffbeb;">Upload KYC Documents</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- KYC Documents Status -->
+            {% if kyc_documents %}
+            <div class="dashboard-card" style="margin-top: 16px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 14px;">KYC Documents</h4>
+                {% for doc in kyc_documents %}
+                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f9fafb; font-size: 13px;">
+                    <span>{{ doc.document_type }}</span>
+                    <span class="kyc-badge kyc-{{ doc.status.lower().replace(' ', '-') if doc.status in ['Pending Review', 'Verified', 'Rejected'] else 'unverified' }}"
+                          style="font-size: 10px;">{{ doc.status }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div>
+            <!-- Active Booking Card -->
+            {% if active_booking %}
+            <div class="dashboard-card" style="margin-bottom: 20px; border-left: 4px solid #00A040;">
+                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <p style="font-size: 11px; color: #9ca3af; margin: 0 0 4px 0;">ACTIVE RENTAL</p>
+                        <h3 style="margin: 0 0 4px 0; font-size: 18px;">{{ active_booking.bike_model }}</h3>
+                        <p style="margin: 0; color: #6b7280; font-size: 13px;">
+                            📍 {{ active_booking.hub }}
+                            {% if active_booking.bike_serial %} | 🚲 {{ active_booking.bike_serial }}{% endif %}
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 11px; color: #9ca3af; margin: 0 0 2px 0;">TIME REMAINING</p>
+                        <p id="countdown-timer" style="font-size: 22px; font-weight: 700; color: #00A040; margin: 0;"></p>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
+                    <div style="display: flex; gap: 16px; font-size: 13px; color: #6b7280; flex-wrap: wrap;">
+                        <span>From: {{ active_booking.start_date }}</span>
+                        <span>To: {{ active_booking.end_date }}</span>
+                        <span>Amount: ₹{{ "%.2f"|format(active_booking.total_amount|float) }}</span>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <a href="/app/rental-booking/{{ active_booking.name }}" class="action-btn"
+                       style="background: #00A040; color: white; font-size: 13px;">View Details</a>
+                </div>
+            </div>
+
+            <script>
+                var endDate = new Date("{{ active_booking.end_date }}T23:59:00").getTime();
+                function updateCountdown() {
+                    var now = new Date().getTime();
+                    var diff = endDate - now;
+                    if (diff <= 0) {
+                        document.getElementById("countdown-timer").textContent = "Ended";
+                        return;
+                    }
+                    var days = Math.floor(diff / (1000*60*60*24));
+                    var hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+                    var mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+                    document.getElementById("countdown-timer").textContent =
+                        days + "d " + hours + "h " + mins + "m";
+                }
+                updateCountdown();
+                setInterval(updateCountdown, 60000);
+            </script>
+            {% else %}
+            <!-- No Active Booking -->
+            <div class="dashboard-card" style="margin-bottom: 20px; text-align: center; padding: 40px;">
+                <p style="font-size: 32px; margin: 0 0 12px 0;">🏍️</p>
+                <h3 style="margin: 0 0 8px 0;">No Active Rentals</h3>
+                <p style="color: #6b7280; margin: 0 0 20px 0;">Ready for a ride? Browse our fleet and book your next adventure.</p>
+                <a href="/" class="action-btn" style="background: #00A040; color: white;">Browse Bikes</a>
+            </div>
+            {% endif %}
+
+            <!-- Recent Bookings -->
+            <div style="margin-top: 24px;">
+                <h2 style="margin: 0 0 16px 0; font-size: 18px;">Recent Bookings</h2>
+                {% if recent_bookings %}
+                <div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: white;">
+                    <table class="table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th>Booking</th>
+                                <th>Model</th>
+                                <th>Hub</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in recent_bookings %}
+                            <tr>
+                                <td><a href="/app/rental-booking/{{ b.name }}">{{ b.name }}</a></td>
+                                <td>{{ b.bike_model }}</td>
+                                <td>{{ b.hub }}</td>
+                                <td>
+                                    {% set status_colors = {"Active": "label-success", "Completed": "label-info", "Confirmed": "label-primary", "Cancelled": "label-danger", "Expired": "label-warning", "Draft": "label-default"} %}
+                                    <span class="label {{ status_colors.get(b.status, 'label-default') }}">{{ b.status }}</span>
+                                </td>
+                                <td>₹{{ "%.2f"|format(b.total_amount|float) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px; border: 1px solid #e5e7eb; border-radius: 12px; background: white;">
+                    <p style="color: #6b7280; margin: 0;">No bookings yet. Start your first rental today!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

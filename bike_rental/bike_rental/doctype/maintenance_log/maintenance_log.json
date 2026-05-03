@@ -1,0 +1,169 @@
+{
+ "autoname": "format:MAINT-{YYYY}-{#####}",
+ "creation": "2026-05-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "serial_no",
+  "bike_model",
+  "hub",
+  "column_break_1",
+  "status",
+  "reported_date",
+  "reported_by",
+  "issue_description",
+  "resolution_section",
+  "resolution_notes",
+  "resolution_cost",
+  "column_break_resolution",
+  "resolved_date",
+  "resolved_by"
+ ],
+ "fields": [
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Link",
+   "label": "Bike Serial",
+   "options": "Bike Serial",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bike_model",
+   "fieldtype": "Link",
+   "label": "Bike Model",
+   "options": "Bike Model",
+   "read_only": 1,
+   "fetch_from": "serial_no.bike_model"
+  },
+  {
+   "fieldname": "hub",
+   "fieldtype": "Link",
+   "label": "Hub",
+   "options": "Hub",
+   "read_only": 1,
+   "fetch_from": "serial_no.hub"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "In Progress\nResolved",
+   "default": "In Progress",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reported_date",
+   "fieldtype": "Datetime",
+   "label": "Reported Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reported_by",
+   "fieldtype": "Link",
+   "label": "Reported By",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "issue_description",
+   "fieldtype": "Small Text",
+   "label": "Issue Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "resolution_section",
+   "fieldtype": "Section Break",
+   "label": "Resolution"
+  },
+  {
+   "fieldname": "resolution_notes",
+   "fieldtype": "Small Text",
+   "label": "Resolution Notes"
+  },
+  {
+   "fieldname": "resolution_cost",
+   "fieldtype": "Currency",
+   "label": "Resolution Cost",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_resolution",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "resolved_date",
+   "fieldtype": "Datetime",
+   "label": "Resolved Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "resolved_by",
+   "fieldtype": "Link",
+   "label": "Resolved By",
+   "options": "User",
+   "read_only": 1
+  }
+ ],
+ "modified": "2026-05-02 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Bike Rental",
+ "name": "Maintenance Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 0,
+   "role": "Hub Staff",
+   "select": 1,
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "search_fields": "serial_no, status",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "serial_no",
+ "track_changes": 1
+}

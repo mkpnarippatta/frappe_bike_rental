@@ -1,0 +1,292 @@
+{
+ "autoname": "format:BIKE-RENT-{YYYY}-{#####}",
+ "creation": "2026-04-30 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "bike_model",
+  "customer",
+  "pickup_hub",
+  "return_hub",
+  "column_break_4",
+  "pickup_datetime",
+  "return_datetime",
+  "status",
+  "details_section",
+  "bike_serial",
+  "payment_entry",
+  "column_break_details",
+  "customer_name",
+  "customer_phone",
+  "billing_section",
+  "total_amount",
+  "payment_method",
+  "check_in_section",
+  "end_km",
+  "end_battery_level",
+  "damage_notes",
+  "column_break_checkin",
+  "excess_km_charges",
+  "late_return_fees",
+  "damage_charges",
+  "invoice_ref",
+  "deposit_released",
+  "cancellation_section",
+  "cancellation_reason",
+  "cancellation_refund_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "bike_model",
+   "fieldtype": "Link",
+   "label": "Bike Model",
+   "options": "Bike Model",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pickup_hub",
+   "fieldtype": "Link",
+   "label": "Pickup Hub",
+   "options": "Hub",
+   "reqd": 1
+  },
+  {
+   "fieldname": "return_hub",
+   "fieldtype": "Link",
+   "label": "Return Hub",
+   "options": "Hub",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pickup_datetime",
+   "fieldtype": "Datetime",
+   "label": "Pickup Datetime",
+   "reqd": 1
+  },
+  {
+   "fieldname": "return_datetime",
+   "fieldtype": "Datetime",
+   "label": "Return Datetime",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nConfirmed\nActive\nCompleted\nCancelled\nExpired",
+   "default": "Draft",
+   "reqd": 1
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "bike_serial",
+   "fieldtype": "Link",
+   "label": "Bike Serial",
+   "options": "Bike Serial"
+  },
+  {
+   "fieldname": "payment_entry",
+   "fieldtype": "Link",
+   "label": "Payment Entry",
+   "options": "Payment Entry"
+  },
+  {
+   "fieldname": "column_break_details",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name"
+  },
+  {
+   "fieldname": "customer_phone",
+   "fieldtype": "Data",
+   "label": "Customer Phone"
+  },
+  {
+   "fieldname": "billing_section",
+   "fieldtype": "Section Break",
+   "label": "Billing"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Cash\nCard\nUPI\nBank Transfer\nOther",
+   "default": "Cash"
+  },
+  {
+   "fieldname": "check_in_section",
+   "fieldtype": "Section Break",
+   "label": "Check-In"
+  },
+  {
+   "fieldname": "end_km",
+   "fieldtype": "Int",
+   "label": "End KM Reading",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "end_battery_level",
+   "fieldtype": "Percent",
+   "label": "End Battery Level"
+  },
+  {
+   "fieldname": "damage_notes",
+   "fieldtype": "Text",
+   "label": "Damage Notes"
+  },
+  {
+   "fieldname": "column_break_checkin",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "excess_km_charges",
+   "fieldtype": "Currency",
+   "label": "Excess KM Charges",
+   "read_only": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "late_return_fees",
+   "fieldtype": "Currency",
+   "label": "Late Return Fees",
+   "read_only": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "damage_charges",
+   "fieldtype": "Currency",
+   "label": "Damage Charges",
+   "read_only": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "invoice_ref",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "deposit_released",
+   "fieldtype": "Check",
+   "label": "Deposit Released",
+   "default": "0"
+  },
+  {
+   "fieldname": "cancellation_section",
+   "fieldtype": "Section Break",
+   "label": "Cancellation"
+  },
+  {
+   "fieldname": "cancellation_reason",
+   "fieldtype": "Small Text",
+   "label": "Cancellation Reason"
+  },
+  {
+   "fieldname": "cancellation_refund_amount",
+   "fieldtype": "Currency",
+   "label": "Cancellation Refund Amount",
+   "read_only": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "swap_section",
+   "fieldtype": "Section Break",
+   "label": "Swap"
+  },
+  {
+   "fieldname": "swapped_from_booking",
+   "fieldtype": "Link",
+   "label": "Swapped From Booking",
+   "options": "Rental Booking",
+   "read_only": 1
+  },
+  {
+   "fieldname": "swap_reason",
+   "fieldtype": "Small Text",
+   "label": "Swap Reason"
+  }
+ ],
+ "modified": "2026-04-30 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Bike Rental",
+ "name": "Rental Booking",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 0,
+   "role": "Hub Staff",
+   "select": 1,
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "search_fields": "bike_model, customer, status, pickup_datetime",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "customer_name",
+ "track_changes": 1
+}

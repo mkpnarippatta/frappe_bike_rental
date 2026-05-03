@@ -1,0 +1,13 @@
+subject: KYC Status Update — {{ kyc_status }}
+<h2>KYC Document Status</h2>
+<p>Dear {{ customer_name }},</p>
+<p>Your KYC document status has been updated to: <strong>{{ kyc_status }}</strong></p>
+{% if kyc_status == "Verified" %}
+<p>You are now verified and can proceed to rent bikes at any of our hubs.</p>
+{% elif kyc_status == "Rejected" %}
+<p>Please upload new documents for review. Contact the hub for details on what went wrong.</p>
+{% elif kyc_status == "Pending Review" %}
+<p>Your documents are being reviewed. We will notify you once the verification is complete.</p>
+{% else %}
+<p>Please check your account for details.</p>
+{% endif %}

@@ -1,0 +1,14 @@
+subject: Booking Confirmed — {{ customer_name }}
+<h2>Booking Confirmed!</h2>
+<p>Dear {{ customer_name }},</p>
+<p>Your bike rental booking has been confirmed.</p>
+<table>
+  <tr><td><strong>Booking ID:</strong></td><td>{{ booking_id }}</td></tr>
+  <tr><td><strong>Hub:</strong></td><td>{{ hub_name }}</td></tr>
+  <tr><td><strong>Bike Model:</strong></td><td>{{ model_name }}</td></tr>
+  <tr><td><strong>Start:</strong></td><td>{{ start_date }} {{ start_time }}</td></tr>
+  <tr><td><strong>End:</strong></td><td>{{ end_date }} {{ end_time }}</td></tr>
+  <tr><td><strong>Total Amount:</strong></td><td>{{ amount }}</td></tr>
+</table>
+<p>Please arrive at the hub at least 15 minutes before your rental starts for check-out.</p>
+<p>Thank you for choosing {{ hub_name }}!</p>

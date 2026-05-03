@@ -1,0 +1,203 @@
+{
+ "autoname": "field:model_name",
+ "creation": "2026-04-30 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "model_name",
+  "brand",
+  "category",
+  "engine_cc",
+  "description_section",
+  "description",
+  "image",
+  "pricing_section",
+  "base_rate_hourly",
+  "base_rate_daily",
+  "inventory_section",
+  "safety_margin",
+  "service_interval_km",
+  "included_km",
+  "per_km_rate",
+  "rate_overrides_section",
+  "rate_overrides",
+  "disabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "model_name",
+   "fieldtype": "Data",
+   "label": "Model Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Data",
+   "label": "Brand",
+   "reqd": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "City\nTouring\nOff-road\nElectric",
+   "reqd": 1
+  },
+  {
+   "fieldname": "engine_cc",
+   "fieldtype": "Int",
+   "label": "Engine CC",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "description_section",
+   "fieldtype": "Section Break",
+   "label": "Description"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
+  },
+  {
+   "fieldname": "pricing_section",
+   "fieldtype": "Section Break",
+   "label": "Pricing"
+  },
+  {
+   "fieldname": "base_rate_hourly",
+   "fieldtype": "Currency",
+   "label": "Base Rate (Hourly)",
+   "reqd": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "base_rate_daily",
+   "fieldtype": "Currency",
+   "label": "Base Rate (Daily)",
+   "reqd": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "inventory_section",
+   "fieldtype": "Section Break",
+   "label": "Inventory"
+  },
+  {
+   "fieldname": "safety_margin",
+   "fieldtype": "Int",
+   "label": "Safety Margin",
+   "default": "0",
+   "description": "Number of bikes held back as unbookable reserve (FR-04)",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "service_interval_km",
+   "fieldtype": "Int",
+   "label": "Service Interval (KM)",
+   "default": "1000",
+   "description": "KM threshold for maintenance alerts",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "included_km",
+   "fieldtype": "Int",
+   "label": "Included KM",
+   "default": "0",
+   "description": "KM included in base rental rate",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "per_km_rate",
+   "fieldtype": "Currency",
+   "label": "Per KM Charge",
+   "default": "0",
+   "description": "Charge per additional KM beyond included KM",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "rate_overrides_section",
+   "fieldtype": "Section Break",
+   "label": "Rate Overrides"
+  },
+  {
+   "fieldname": "rate_overrides",
+   "fieldtype": "Table",
+   "label": "Rate Overrides",
+   "options": "Bike Model Rate Override"
+  },
+  {
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled",
+   "default": "0",
+   "description": "Hide from customer website"
+  }
+ ],
+ "icon": "fa-bicycle",
+ "modified": "2026-04-30 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Bike Rental",
+ "name": "Bike Model",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Staff",
+   "select": 1,
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "quick_entry": 1,
+ "search_fields": "model_name, brand",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "model_name",
+ "track_changes": 1
+}

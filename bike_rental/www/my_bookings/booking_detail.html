@@ -1,0 +1,191 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 14px;
+    }
+    .detail-label { color: #6b7280; }
+    .detail-value { font-weight: 500; }
+    .status-timeline { position: relative; padding-left: 24px; }
+    .status-step { position: relative; padding-bottom: 20px; }
+    .status-step::before {
+        content: '';
+        position: absolute;
+        left: -16px;
+        top: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #d1d5db;
+    }
+    .status-step.completed::before { background: #00A040; }
+    .status-step.active::before { background: #00A040; box-shadow: 0 0 0 3px rgba(0,160,64,0.2); }
+</style>
+
+<div style="max-width: 700px; margin: 0 auto; padding: 32px 16px;">
+    {% if booking %}
+    <a href="/my_bookings" style="color: #00A040; text-decoration: none; font-size: 13px;">← Back to My Bookings</a>
+
+    <div style="display: flex; justify-content: space-between; align-items: start; margin: 16px 0 24px;">
+        <div>
+            <h1 style="margin: 0 0 4px 0; font-size: 20px;">{{ booking.name }}</h1>
+            <p style="margin: 0; color: #6b7280; font-size: 14px;">{{ booking.bike_model }}</p>
+        </div>
+        {% set sc = {"Active": "label-success", "Completed": "label-info", "Confirmed": "label-primary", "Cancelled": "label-danger", "Expired": "label-warning", "Draft": "label-default"} %}
+        <span class="label {{ sc.get(booking.status, 'label-default') }}" style="font-size: 13px; padding: 6px 12px;">{{ booking.status }}</span>
+    </div>
+
+    <!-- Booking Details -->
+    <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; background: white; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 15px;">Booking Details</h3>
+
+        <div class="detail-row">
+            <span class="detail-label">Customer</span>
+            <span class="detail-value">{{ booking.customer_name }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Pickup Hub</span>
+            <span class="detail-value">{{ booking.pickup_hub }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Return Hub</span>
+            <span class="detail-value">{{ booking.return_hub or booking.pickup_hub }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Pickup</span>
+            <span class="detail-value">{{ booking.pickup_datetime }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Return</span>
+            <span class="detail-value">{{ booking.return_datetime }}</span>
+        </div>
+        {% if booking.bike_serial %}
+        <div class="detail-row">
+            <span class="detail-label">Bike Serial</span>
+            <span class="detail-value">{{ booking.bike_serial }}</span>
+        </div>
+        {% endif %}
+        <div class="detail-row" style="border-bottom: none; font-weight: 600;">
+            <span>Total Amount</span>
+            <span style="color: #00A040;">₹{{ "%.2f"|format(booking.total_amount|float) }}</span>
+        </div>
+    </div>
+
+    <!-- Payment Info -->
+    <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; background: white; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 15px;">Payment</h3>
+        {% if payment %}
+        <div class="detail-row">
+            <span class="detail-label">Payment Entry</span>
+            <span class="detail-value">{{ payment.name }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Amount</span>
+            <span class="detail-value">₹{{ "%.2f"|format(payment.paid_amount|float) }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Method</span>
+            <span class="detail-value">{{ payment.mode_of_payment }}</span>
+        </div>
+        <div class="detail-row" style="border-bottom: none;">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ payment.posting_date }}</span>
+        </div>
+        {% if booking.deposit_released %}
+        <div class="detail-row" style="border-bottom: none; color: #065f46;">
+            <span>Deposit Released</span>
+            <span>Yes</span>
+        </div>
+        {% endif %}
+        {% else %}
+        <p style="color: #9ca3af; margin: 0;">No payment recorded</p>
+        {% endif %}
+    </div>
+
+    <!-- Charges (for completed bookings) -->
+    {% if booking.excess_km_charges or booking.late_return_fees or booking.damage_charges %}
+    <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; background: white; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 15px;">Additional Charges</h3>
+        {% if booking.excess_km_charges %}
+        <div class="detail-row">
+            <span class="detail-label">Excess KM</span>
+            <span class="detail-value">₹{{ "%.2f"|format(booking.excess_km_charges|float) }}</span>
+        </div>
+        {% endif %}
+        {% if booking.late_return_fees %}
+        <div class="detail-row">
+            <span class="detail-label">Late Return Fee</span>
+            <span class="detail-value">₹{{ "%.2f"|format(booking.late_return_fees|float) }}</span>
+        </div>
+        {% endif %}
+        {% if booking.damage_charges %}
+        <div class="detail-row" style="border-bottom: none;">
+            <span class="detail-label">Damage Charges</span>
+            <span class="detail-value">₹{{ "%.2f"|format(booking.damage_charges|float) }}</span>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Status Timeline -->
+    <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; background: white; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 15px;">Status Timeline</h3>
+        <div class="status-timeline">
+            {% set steps = [
+                ("Draft", "Booking created"),
+                ("Confirmed", "Payment confirmed"),
+                ("Active", "Rental in progress"),
+                ("Completed", "Bike returned"),
+            ] %}
+            {% set current_idx = namespace(value=0) %}
+            {% for s, label in steps %}
+                {% if s == booking.status %}
+                    {% set current_idx.value = loop.index0 %}
+                {% endif %}
+            {% endfor %}
+            {% for s, label in steps %}
+                {% set s_s = namespace(value=s) %}
+                {% set cls = "" %}
+                {% if loop.index0 < current_idx.value %}
+                    {% set cls = "completed" %}
+                {% elif loop.index0 == current_idx.value %}
+                    {% set cls = "active" %}
+                {% endif %}
+                <div class="status-step {{ cls }}">
+                    <strong>{{ s }}</strong><br>
+                    <span style="font-size: 12px; color: #6b7280;">{{ label }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Cancellation Info -->
+    {% if booking.cancellation_reason %}
+    <div style="border: 1px solid #fef2f2; border-radius: 12px; padding: 24px; background: #fef2f2; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #991b1b;">Cancellation</h3>
+        <div class="detail-row" style="border-color: #fecaca;">
+            <span class="detail-label">Reason</span>
+            <span class="detail-value">{{ booking.cancellation_reason }}</span>
+        </div>
+        {% if booking.cancellation_refund_amount %}
+        <div class="detail-row" style="border-bottom: none; border-color: #fecaca;">
+            <span class="detail-label">Refund Amount</span>
+            <span class="detail-value">₹{{ "%.2f"|format(booking.cancellation_refund_amount|float) }}</span>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div style="text-align: center; padding: 60px;">
+        <h2 style="color: #6b7280;">Booking Not Found</h2>
+        <a href="/my_bookings" style="color: #00A040;">View my bookings</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

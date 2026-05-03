@@ -1,0 +1,115 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 0 16px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-size: 24px; margin: 0 0 8px 0;">Create Account</h1>
+        <p style="color: #6b7280; margin: 0;">Join Bike Rental and start riding</p>
+    </div>
+
+    <div id="register-error" style="display: none; padding: 12px; background: #fef2f2; color: #991b1b; border-radius: 8px; margin-bottom: 16px; font-size: 13px;"></div>
+    <div id="register-success" style="display: none; padding: 12px; background: #d1fae5; color: #065f46; border-radius: 8px; margin-bottom: 16px; font-size: 13px;"></div>
+
+    <form id="register-form" onsubmit="return handleRegister(event)">
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Full Name</label>
+            <input type="text" id="reg-name" class="form-control" required
+                   style="width: 100%;">
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Email</label>
+            <input type="email" id="reg-email" class="form-control" required
+                   placeholder="email@example.com" style="width: 100%;">
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Phone Number</label>
+            <input type="tel" id="reg-phone" class="form-control"
+                   value="{{ mobile }}" {% if mobile %}readonly{% endif %}
+                   style="width: 100%;{% if mobile %} background: #f3f4f6;{% endif %}">
+            {% if mobile %}
+            <input type="hidden" id="reg-phone-hidden" value="{{ mobile }}">
+            <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0 0;">Verified via OTP</p>
+            {% endif %}
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Password</label>
+            <input type="password" id="reg-password" class="form-control"
+                   {% if not mobile %}required{% endif %} minlength="6"
+                   style="width: 100%;">
+            {% if mobile %}
+            <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0 0;">Leave blank to sign in with OTP only</p>
+            {% else %}
+            <p style="font-size: 11px; color: #9ca3af; margin: 4px 0 0 0;">Minimum 6 characters</p>
+            {% endif %}
+        </div>
+        <button type="submit" id="register-btn" class="btn btn-primary"
+                style="width: 100%; padding: 12px; background: #00A040; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
+            Create Account
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <p style="font-size: 13px; color: #6b7280;">
+            Already have an account?
+            <a href="/login" style="color: #00A040; font-weight: 500;">Log in</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    var redirectTo = new URLSearchParams(window.location.search).get("redirect_to") || "";
+
+    function handleRegister(e) {
+        e.preventDefault();
+        var errorEl = document.getElementById("register-error");
+        var successEl = document.getElementById("register-success");
+        var btn = document.getElementById("register-btn");
+        errorEl.style.display = "none";
+        successEl.style.display = "none";
+
+        var name = document.getElementById("reg-name").value.trim();
+        var email = document.getElementById("reg-email").value.trim();
+        var phoneEl = document.getElementById("reg-phone");
+        var phone = phoneEl.value.trim() || (document.getElementById("reg-phone-hidden") ? document.getElementById("reg-phone-hidden").value : "");
+        var password = document.getElementById("reg-password").value;
+
+        if (password && password.length < 6) {
+            errorEl.textContent = "Password must be at least 6 characters.";
+            errorEl.style.display = "block";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Creating account...";
+
+        frappe.call({
+            method: "bike_rental.www.register.index.register_customer",
+            args: {
+                full_name: name,
+                email: email,
+                mobile: phone,
+                password: password,
+                redirect_to: redirectTo,
+            },
+            callback: function (r) {
+                if (r.message && r.message.redirect) {
+                    window.location.href = r.message.redirect;
+                }
+            },
+            error: function (r) {
+                var msg = "Registration failed. Please try again.";
+                if (r._server_messages) {
+                    msg = JSON.parse(r._server_messages).join(" ");
+                }
+                errorEl.textContent = msg;
+                errorEl.style.display = "block";
+            },
+            always: function () {
+                btn.disabled = false;
+                btn.textContent = "Create Account";
+            },
+        });
+        return false;
+    }
+</script>
+{% endblock %}

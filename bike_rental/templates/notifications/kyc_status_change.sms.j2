@@ -1,0 +1,2 @@
+subject: KYC Update
+{{ customer_name }}, your KYC status is now {{ kyc_status }}. {% if kyc_status == "Verified" %}You can now rent bikes!{% elif kyc_status == "Rejected" %}Please re-upload your documents.{% endif %}

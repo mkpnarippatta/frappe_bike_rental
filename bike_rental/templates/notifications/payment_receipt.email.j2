@@ -1,0 +1,10 @@
+subject: Payment Receipt — {{ booking_id }}
+<h2>Payment Received</h2>
+<p>Dear {{ customer_name }},</p>
+<p>Your payment of <strong>{{ amount }}</strong> for booking <strong>{{ booking_id }}</strong> at {{ hub_name }} has been received.</p>
+<table>
+  <tr><td><strong>Payment Method:</strong></td><td>{{ payment_method }}</td></tr>
+  <tr><td><strong>Amount:</strong></td><td>{{ amount }}</td></tr>
+  <tr><td><strong>Date:</strong></td><td>{{ date }}</td></tr>
+</table>
+<p>Thank you for your payment. Ride safely!</p>

@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Downtown Hub",
+        "hub_name": "Downtown Hub",
+        "location": "123 Main Street, City Center",
+        "operating_hours_start": "06:00:00",
+        "operating_hours_end": "22:00:00",
+        "doctype": "Hub",
+        "disabled": 0
+    },
+    {
+        "name": "Airport Hub",
+        "hub_name": "Airport Hub",
+        "location": "Terminal 2, International Airport",
+        "operating_hours_start": "06:00:00",
+        "operating_hours_end": "22:00:00",
+        "doctype": "Hub",
+        "disabled": 0
+    }
+]

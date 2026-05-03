@@ -1,0 +1,163 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+    .checkout-summary {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        background: white;
+    }
+</style>
+
+<div style="max-width: 600px; margin: 40px auto; padding: 0 16px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-size: 24px; margin: 0 0 8px 0;">Checkout</h1>
+        <p style="color: #6b7280; margin: 0;">Review your booking details</p>
+    </div>
+
+    <div id="checkout-error" style="display: none; padding: 12px; background: #fef2f2; color: #991b1b; border-radius: 8px; margin-bottom: 16px; font-size: 13px;"></div>
+
+    <!-- Booking Summary -->
+    <div class="checkout-summary" style="margin-bottom: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px;">Booking Summary</h3>
+        <div style="display: grid; gap: 12px;">
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Model</span>
+                <span id="summary-model" style="font-weight: 500;">{{ model_name or '—' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Hub</span>
+                <span id="summary-hub" style="font-weight: 500;">{{ hub or '—' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Pickup</span>
+                <span id="summary-start" style="font-weight: 500;">{{ start_date or '—' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Return</span>
+                <span id="summary-end" style="font-weight: 500;">{{ end_date or '—' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Daily Rate × <span id="summary-days">{{ days or '—' }}</span> day(s)</span>
+                <span id="summary-base" style="font-weight: 500;">{% if base_amount %}₹ {{ "%.0f"|format(base_amount) }}{% else %}—{% endif %}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Security Deposit</span>
+                <span id="summary-deposit" style="font-weight: 500;">{% if deposit %}₹ {{ "%.0f"|format(deposit) }}{% else %}—{% endif %}</span>
+            </div>
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; display: flex; justify-content: space-between;">
+                <span style="font-weight: 600;">Total Due</span>
+                <span id="summary-total" style="font-weight: 700; color: #00A040; font-size: 18px;">{% if total_due %}₹ {{ "%.0f"|format(total_due) }}{% else %}—{% endif %}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="checkout-summary" style="margin-bottom: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px;">Payment Method</h3>
+        <div style="margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; padding: 12px; border: 2px solid #00A040; border-radius: 8px; cursor: pointer; background: #f0fdf4;">
+                <input type="radio" name="payment-method" value="Cash" checked style="margin-right: 12px;">
+                <div>
+                    <span style="font-weight: 500;">Cash</span>
+                    <p style="margin: 2px 0 0 0; font-size: 12px; color: #6b7280;">Pay at the hub during pickup</p>
+                </div>
+            </label>
+        </div>
+        <div style="margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+                <input type="radio" name="payment-method" value="Card" style="margin-right: 12px;">
+                <div>
+                    <span style="font-weight: 500;">Card Payment</span>
+                    <p style="margin: 2px 0 0 0; font-size: 12px; color: #6b7280;">Pay online via secure gateway</p>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Submit -->
+    <button id="confirm-btn" class="btn btn-primary"
+            style="width: 100%; padding: 14px; background: #00A040; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
+        Confirm Booking
+    </button>
+</div>
+
+<script>
+    var params = new URLSearchParams(window.location.search);
+    var model = params.get("model") || "{{ model_name }}";
+    var hub = params.get("hub") || "{{ hub }}";
+    var startDate = params.get("start") || "{{ start_date }}";
+    var endDate = params.get("end") || "{{ end_date }}";
+
+    // If no URL params, check if we were redirected from booking widget
+    if (!model || !startDate || !endDate) {
+        document.getElementById("checkout-error").textContent =
+            "Missing booking information. Please go back and select dates.";
+        document.getElementById("checkout-error").style.display = "block";
+        document.getElementById("confirm-btn").disabled = true;
+    }
+
+    document.getElementById("confirm-btn").addEventListener("click", function () {
+        var btn = this;
+        var errorEl = document.getElementById("checkout-error");
+        errorEl.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Processing...";
+
+        // Step 1: Create booking
+        frappe.call({
+            method: "bike_rental.www.checkout.index.create_booking",
+            args: {
+                model: model,
+                hub: hub,
+                start_datetime: startDate + " 10:00:00",
+                end_datetime: endDate + " 10:00:00",
+            },
+            callback: function (r) {
+                if (r.message) {
+                    var bookingName = r.message.name;
+                    var amount = r.message.total_amount;
+                    var paymentMethod = document.querySelector(
+                        'input[name="payment-method"]:checked'
+                    ).value;
+
+                    // Step 2: Process payment
+                    frappe.call({
+                        method: "bike_rental.www.checkout.index.process_payment",
+                        args: {
+                            booking_name: bookingName,
+                            amount: amount,
+                            payment_method: paymentMethod,
+                        },
+                        callback: function (pr) {
+                            if (pr.message) {
+                                window.location.href = "/confirmation?booking=" +
+                                    pr.message.booking_name + "&amount=" +
+                                    pr.message.payment_entry;
+                            }
+                        },
+                        error: function (pr) {
+                            errorEl.textContent = "Payment failed: " +
+                                (pr._server_messages || "Please try again.");
+                            errorEl.style.display = "block";
+                            btn.disabled = false;
+                            btn.textContent = "Confirm Booking";
+                        },
+                    });
+                }
+            },
+            error: function (r) {
+                var msg = "Failed to create booking.";
+                if (r._server_messages) {
+                    msg = JSON.parse(r._server_messages).join(" ");
+                }
+                errorEl.textContent = msg;
+                errorEl.style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "Confirm Booking";
+            },
+        });
+    });
+</script>
+{% endblock %}

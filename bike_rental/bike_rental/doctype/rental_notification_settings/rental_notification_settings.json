@@ -1,0 +1,213 @@
+{
+ "autoname": "Prompt",
+ "creation": "2026-05-02 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sms_settings_section",
+  "sms_gateway_url",
+  "sms_api_key",
+  "sms_sender_id",
+  "twilio_section",
+  "twilio_account_sid",
+  "twilio_auth_token",
+  "twilio_phone_number",
+  "whatsapp_settings_section",
+  "whatsapp_phone_number_id",
+  "whatsapp_access_token",
+  "whatsapp_template_name",
+  "email_settings_section",
+  "default_email_sender",
+  "general_section",
+  "max_retries",
+  "channel_settings_section",
+  "enable_email_channel",
+  "enable_sms_channel",
+  "enable_whatsapp_channel",
+  "enable_in_app_channel"
+ ],
+ "fields": [
+  {
+   "fieldname": "sms_settings_section",
+   "fieldtype": "Section Break",
+   "label": "SMS Gateway Settings"
+  },
+  {
+   "fieldname": "sms_gateway_url",
+   "fieldtype": "Data",
+   "label": "SMS Gateway URL"
+  },
+  {
+   "fieldname": "sms_api_key",
+   "fieldtype": "Password",
+   "label": "SMS API Key"
+  },
+  {
+   "fieldname": "sms_sender_id",
+   "fieldtype": "Data",
+   "label": "SMS Sender ID"
+  },
+  {
+   "fieldname": "twilio_section",
+   "fieldtype": "Section Break",
+   "label": "Twilio SMS Settings"
+  },
+  {
+   "fieldname": "twilio_account_sid",
+   "fieldtype": "Password",
+   "label": "Twilio Account SID"
+  },
+  {
+   "fieldname": "twilio_auth_token",
+   "fieldtype": "Password",
+   "label": "Twilio Auth Token"
+  },
+  {
+   "fieldname": "twilio_phone_number",
+   "fieldtype": "Data",
+   "label": "Twilio Phone Number",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "whatsapp_settings_section",
+   "fieldtype": "Section Break",
+   "label": "WhatsApp API Settings"
+  },
+  {
+   "fieldname": "whatsapp_phone_number_id",
+   "fieldtype": "Data",
+   "label": "WhatsApp Phone Number ID"
+  },
+  {
+   "fieldname": "whatsapp_access_token",
+   "fieldtype": "Password",
+   "label": "WhatsApp Access Token"
+  },
+  {
+   "fieldname": "whatsapp_template_name",
+   "fieldtype": "Data",
+   "label": "WhatsApp Template Name",
+   "description": "Approved template name for OTP (e.g. otp_verification)"
+  },
+  {
+   "fieldname": "email_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Email Settings"
+  },
+  {
+   "fieldname": "default_email_sender",
+   "fieldtype": "Data",
+   "label": "Default Email Sender"
+  },
+  {
+   "fieldname": "general_section",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "max_retries",
+   "fieldtype": "Int",
+   "label": "Max Retries",
+   "default": "3"
+  },
+  {
+   "fieldname": "channel_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Channel Settings"
+  },
+  {
+   "fieldname": "enable_email_channel",
+   "fieldtype": "Check",
+   "label": "Enable Email Channel",
+   "default": 1
+  },
+  {
+   "fieldname": "enable_sms_channel",
+   "fieldtype": "Check",
+   "label": "Enable SMS Channel",
+   "default": 0
+  },
+  {
+   "fieldname": "enable_whatsapp_channel",
+   "fieldtype": "Check",
+   "label": "Enable WhatsApp Channel",
+   "default": 0
+  },
+  {
+   "fieldname": "enable_in_app_channel",
+   "fieldtype": "Check",
+   "label": "Enable In-App Channel",
+   "default": 1
+  }
+ ],
+ "permissions": [
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 0,
+   "if_owner": 0,
+   "import": 0,
+   "permlevel": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Manager",
+   "select": 1,
+   "set_user_permissions": 0,
+   "share": 1,
+   "submit": 0,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "if_owner": 0,
+   "import": 0,
+   "permlevel": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Hub Staff",
+   "select": 1,
+   "set_user_permissions": 0,
+   "share": 1,
+   "submit": 0,
+   "write": 0
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 0,
+   "import": 1,
+   "permlevel": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "set_user_permissions": 0,
+   "share": 1,
+   "submit": 0,
+   "write": 1
+  }
+ ],
+ "quick_entry": 0,
+ "search_fields": "sms_gateway_url",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 0,
+ "issingle": 1,
+ "name": "Rental Notification Settings",
+ "module": "Bike Rental"
+}

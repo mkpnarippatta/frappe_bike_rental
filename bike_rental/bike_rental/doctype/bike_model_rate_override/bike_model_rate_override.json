@@ -1,0 +1,68 @@
+{
+ "autoname": "hash",
+ "creation": "2026-04-30 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "start_date",
+  "end_date",
+  "day_of_week",
+  "column_break_4",
+  "override_rate_hourly",
+  "override_rate_daily",
+  "label"
+ ],
+ "fields": [
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "day_of_week",
+   "fieldtype": "Select",
+   "label": "Day of Week",
+   "options": "\nSunday\nMonday\nTuesday\nWednesday\nThursday\nFriday\nSaturday"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "override_rate_hourly",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Override Rate (Hourly)",
+   "reqd": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "override_rate_daily",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Override Rate (Daily)",
+   "reqd": 1,
+   "non_negative": 1
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label"
+  }
+ ],
+ "istable": 1,
+ "modified": "2026-04-30 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Bike Rental",
+ "name": "Bike Model Rate Override",
+ "owner": "Administrator",
+ "permissions": []
+}

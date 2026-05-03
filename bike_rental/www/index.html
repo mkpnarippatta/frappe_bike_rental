@@ -1,0 +1,306 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+    /* Inline styles for MVP — no build step needed */
+    .hero-gradient {
+        background: linear-gradient(135deg, #00A040 0%, #007a30 100%);
+    }
+    .category-chip {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 500;
+        background-color: #f3f4f6;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .category-chip.active {
+        background-color: #00A040;
+        color: white;
+    }
+    .category-chip:hover {
+        background-color: #e5e7eb;
+    }
+    .category-chip.active:hover {
+        background-color: #007a30;
+    }
+    @media (max-width: 640px) {
+        .bike-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<div>
+    <!-- Hero Section -->
+    <div class="hero-gradient text-white" style="padding: 48px 16px; text-align: center;">
+        <h1 style="font-size: 28px; font-weight: 700; margin: 0 0 8px 0;">Rent the Perfect Bike</h1>
+        <p style="font-size: 16px; opacity: 0.9; margin: 0 0 24px 0;">
+            Explore our fleet of city, mountain, and electric bikes
+        </p>
+
+        <!-- Booking Search Widget -->
+        <div style="max-width: 760px; margin: 0 auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                <!-- Pickup Date -->
+                <div style="text-align: left; flex: 1 1 200px; min-width: 0;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Pickup</label>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="datetime-local" id="start-datetime" class="form-control"
+                               style="padding: 10px 12px; font-size: 14px; border-radius: 8px; border: 1px solid #d1d5db; flex: 1; min-width: 0; color: #111827; box-sizing: border-box;"
+                               min="">
+                    </div>
+                </div>
+                <!-- Return Date -->
+                <div style="text-align: left; flex: 1 1 200px; min-width: 0;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Return</label>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="datetime-local" id="end-datetime" class="form-control"
+                               style="padding: 10px 12px; font-size: 14px; border-radius: 8px; border: 1px solid #d1d5db; flex: 1; min-width: 0; color: #111827; box-sizing: border-box;"
+                               min="">
+                    </div>
+                </div>
+                <!-- Search Button -->
+                <div style="flex: 0 0 auto;">
+                    <button id="search-bikes-btn"
+                            style="padding: 10px 24px; background: #00A040; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; height: 40px;">
+                        Search Bikes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="max-width: 1200px; margin: 0 auto; padding: 24px 16px;">
+        <!-- Category Filters -->
+        <div id="category-filters" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 8px;">
+            <span class="category-chip active" data-category="all">All</span>
+            {% for cat in categories %}
+            <span class="category-chip" data-category="{{ cat }}">{{ cat }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Bike Grid -->
+        <div id="bike-grid" class="bike-grid"
+             style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            {% for m in models %}
+            <div class="bike-card"
+                 style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; background: white;"
+                 data-category="{{ m.category or '' }}">
+                <div style="height: 160px; background: #f9fafb; display: flex; align-items: center; justify-content: center;">
+                    {% if m.image %}
+                    <img src="{{ m.image }}" alt="{{ m.name }}" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                    {% else %}
+                    <span style="font-size: 48px;">🚲</span>
+                    {% endif %}
+                </div>
+                <div style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">{{ m.name }}</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 13px; color: #6b7280;">{{ m.brand or '' }}</p>
+                        </div>
+                        {% if m.total_serials > 0 %}
+                        <span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: #d1fae5; color: #065f46;">Available</span>
+                        {% else %}
+                        <span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: #f3f4f6; color: #9ca3af;">Unavailable</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                        {% if m.category %}
+                        <span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; background: #f3f4f6; color: #374151;">{{ m.category }}</span>
+                        {% endif %}
+                        {% for hub in m.hubs %}
+                        <span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; background: #e0f2fe; color: #0369a1;">{{ hub }}</span>
+                        {% endfor %}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 20px; font-weight: 700; color: #00A040;">₹{{ "%.0f"|format(m.base_rate_daily|float) }}</span>
+                            <span style="font-size: 12px; color: #6b7280;"> /day</span>
+                        </div>
+                        {% if m.total_serials > 0 %}
+                        <a href="/bikes?name={{ m.name|urlencode }}"
+                           style="padding: 8px 16px; background: #00A040; color: white; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500;">
+                            Book Now
+                        </a>
+                        {% else %}
+                        <span style="padding: 8px 16px; background: #f3f4f6; color: #9ca3af; border-radius: 8px; font-size: 13px; font-weight: 500;">Unavailable</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" style="display: none; text-align: center; padding: 60px 0;">
+            <p style="font-size: 18px; color: #6b7280;">No bikes found.</p>
+            <p style="color: #9ca3af; margin-top: 8px;">Try adjusting the category filter.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function roundToNext30Min(d) {
+        var ms = 30 * 60 * 1000;
+        return new Date(Math.ceil(d.getTime() / ms) * ms);
+    }
+
+    function toLocalDatetimeValue(d) {
+        var y = d.getFullYear();
+        var mo = ("0" + (d.getMonth() + 1)).slice(-2);
+        var da = ("0" + d.getDate()).slice(-2);
+        var h = ("0" + d.getHours()).slice(-2);
+        var mi = ("0" + d.getMinutes()).slice(-2);
+        return y + "-" + mo + "-" + da + "T" + h + ":" + mi;
+    }
+
+    // Set defaults: now (rounded up) and tomorrow
+    var now = new Date();
+    var startDefault = roundToNext30Min(now);
+    var tomorrow = new Date(startDefault);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    var startInput = document.getElementById("start-datetime");
+    var endInput = document.getElementById("end-datetime");
+    function clampToFuture(input) {
+        var minVal = toLocalDatetimeValue(roundToNext30Min(new Date()));
+        input.min = minVal;
+        if (input.value && input.value < minVal) {
+            input.value = minVal;
+        }
+    }
+
+    startInput.value = toLocalDatetimeValue(startDefault);
+    startInput.min = toLocalDatetimeValue(startDefault);
+    endInput.value = toLocalDatetimeValue(tomorrow);
+    endInput.min = toLocalDatetimeValue(startDefault);
+
+    // Disallow past on start, enforce start ≤ end
+    startInput.addEventListener("change", function () {
+        clampToFuture(this);
+        endInput.min = this.value;
+        if (endInput.value && endInput.value <= this.value) {
+            endInput.value = "";
+        }
+    });
+    endInput.addEventListener("change", function () {
+        clampToFuture(this);
+    });
+
+    // Search button passes dates to bike detail page
+    document.getElementById("search-bikes-btn").addEventListener("click", function () {
+        var start = document.getElementById("start-datetime").value;
+        var end = document.getElementById("end-datetime").value;
+        if (start && end) {
+            window.location.href = "/?start=" + encodeURIComponent(start) + "&end=" + encodeURIComponent(end);
+        }
+    });
+
+    // Category filter clicks
+    document.querySelectorAll(".category-chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+            document.querySelectorAll(".category-chip").forEach(function (c) {
+                c.classList.remove("active");
+            });
+            this.classList.add("active");
+            filterCatalogue();
+        });
+    });
+
+    var catalogueData = {{ models_json }};
+
+    // Pre-fill from URL params (e.g., from search redirect)
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlStart = urlParams.get("start");
+    var urlEnd = urlParams.get("end");
+    if (urlStart) { startInput.value = urlStart; startInput.min = urlStart; }
+    if (urlEnd) { endInput.value = urlEnd; }
+    if (startInput.value && endInput.value) filterCatalogue();
+
+    function renderBikes(models) {
+        var grid = document.getElementById("bike-grid");
+        grid.innerHTML = "";
+        grid.style.display = "grid";
+        var start = document.getElementById("start-datetime").value;
+        var end = document.getElementById("end-datetime").value;
+
+        models.forEach(function (m) {
+            var link = "/bikes?name=" + encodeURIComponent(m.name);
+            if (start && end) {
+                link += "&start=" + encodeURIComponent(start) + "&end=" + encodeURIComponent(end);
+            }
+
+            var hasSerials = (m.total_serials || 0) > 0;
+            var hubTags = (m.hubs || []).map(function (h) {
+                return '<span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; background: #e0f2fe; color: #0369a1;">' + h + '</span>';
+            }).join("");
+
+            var card = document.createElement("div");
+            card.className = "bike-card";
+            card.style.cssText = "border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; background: white;";
+            card.setAttribute("data-category", m.category || "");
+
+            card.innerHTML = `
+                <div style="height: 160px; background: #f9fafb; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 48px;">🚲</span>
+                </div>
+                <div style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">${m.name}</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 13px; color: #6b7280;">${m.brand || ""}</p>
+                        </div>
+                        ${hasSerials
+                            ? '<span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: #d1fae5; color: #065f46;">Available</span>'
+                            : '<span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: #f3f4f6; color: #9ca3af;">Unavailable</span>'}
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                        ${m.category ? '<span style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; background: #f3f4f6; color: #374151;">' + m.category + '</span>' : ""}
+                        ${hubTags}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 20px; font-weight: 700; color: #00A040;">₹${parseFloat(m.base_rate_daily || 0).toFixed(0)}</span>
+                            <span style="font-size: 12px; color: #6b7280;"> /day</span>
+                        </div>
+                        ${hasSerials
+                            ? '<a href="' + link + '" style="padding: 8px 16px; background: #00A040; color: white; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500;">Book Now</a>'
+                            : '<span style="padding: 8px 16px; background: #f3f4f6; color: #9ca3af; border-radius: 8px; font-size: 13px; font-weight: 500;">Unavailable</span>'}
+                    </div>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+
+    function filterCatalogue() {
+        var activeCategory = document.querySelector(".category-chip.active");
+        var category = activeCategory ? activeCategory.getAttribute("data-category") : "all";
+        var grid = document.getElementById("bike-grid");
+        var emptyEl = document.getElementById("empty-state");
+
+        var filtered = catalogueData;
+        if (category !== "all") {
+            filtered = catalogueData.filter(function (m) {
+                return (m.category || "").toLowerCase() === category.toLowerCase();
+            });
+        }
+
+        if (filtered.length > 0) {
+            renderBikes(filtered);
+            grid.style.display = "grid";
+            emptyEl.style.display = "none";
+        } else {
+            grid.style.display = "none";
+            emptyEl.style.display = "block";
+        }
+    }
+</script>
+{% endblock %}

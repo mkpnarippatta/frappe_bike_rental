@@ -1,0 +1,2 @@
+# Migration patches — ordered list of patch files
+# Patches are applied in order during `bench migrate`

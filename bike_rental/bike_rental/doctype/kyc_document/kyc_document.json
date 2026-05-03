@@ -1,0 +1,167 @@
+{
+    "autoname":  "hash",
+    "creation":  "2026-05-02 00:00:00",
+    "doctype":  "DocType",
+    "engine":  "InnoDB",
+    "field_order":  [
+                        "customer",
+                        "document_type",
+                        "document",
+                        "column_break_1",
+                        "status",
+                        "uploaded_date",
+                        "review_section",
+                        "reviewed_by",
+                        "review_date",
+                        "rejection_reason",
+                        "expiry_date"
+                    ],
+    "fields":  [
+                   {
+                       "fieldname":  "customer",
+                       "fieldtype":  "Link",
+                       "in_list_view":  1,
+                       "in_standard_filter":  1,
+                       "label":  "Customer",
+                       "options":  "Customer",
+                       "reqd":  1,
+                       "search_index":  1
+                   },
+                   {
+                       "fieldname":  "document_type",
+                       "fieldtype":  "Select",
+                       "in_list_view":  1,
+                       "in_standard_filter":  1,
+                       "label":  "Document Type",
+                       "options":  "ID Proof\nDriving License",
+                       "reqd":  1
+                   },
+                   {
+                       "fieldname":  "document",
+                       "fieldtype":  "Attach",
+                       "label":  "Document",
+                       "reqd":  1
+                   },
+                   {
+                       "fieldname":  "column_break_1",
+                       "fieldtype":  "Column Break"
+                   },
+                   {
+                       "fieldname":  "status",
+                       "fieldtype":  "Select",
+                       "in_list_view":  1,
+                       "in_standard_filter":  1,
+                       "label":  "Status",
+                       "default":  "Pending Review",
+                       "options":  "Pending Review\nVerified\nRejected\nExpired"
+                   },
+                   {
+                       "fieldname":  "uploaded_date",
+                       "fieldtype":  "Datetime",
+                       "label":  "Uploaded Date",
+                       "read_only":  1
+                   },
+                   {
+                       "fieldname":  "review_section",
+                       "fieldtype":  "Section Break",
+                       "label":  "Review"
+                   },
+                   {
+                       "fieldname":  "reviewed_by",
+                       "fieldtype":  "Link",
+                       "label":  "Reviewed By",
+                       "options":  "User",
+                       "read_only":  1
+                   },
+                   {
+                       "fieldname":  "review_date",
+                       "fieldtype":  "Datetime",
+                       "label":  "Review Date",
+                       "read_only":  1
+                   },
+                   {
+                       "fieldname":  "rejection_reason",
+                       "fieldtype":  "Small Text",
+                       "label":  "Rejection Reason",
+                       "read_only":  1
+                   },
+                   {
+                       "fieldtype":  "Date",
+                       "label":  "Expiry Date",
+                       "read_only":  true,
+                       "fieldname":  "expiry_date"
+                   }
+               ],
+    "modified":  "2026-05-02 00:00:00",
+    "modified_by":  "Administrator",
+    "module":  "Bike Rental",
+    "name":  "KYC Document",
+    "owner":  "Administrator",
+    "permissions":  [
+                        {
+                            "amend":  0,
+                            "cancel":  0,
+                            "create":  1,
+                            "delete":  0,
+                            "email":  1,
+                            "export":  0,
+                            "print":  1,
+                            "read":  1,
+                            "report":  0,
+                            "role":  "Customer",
+                            "select":  1,
+                            "share":  0,
+                            "write":  0
+                        },
+                        {
+                            "amend":  0,
+                            "cancel":  0,
+                            "create":  0,
+                            "delete":  0,
+                            "email":  1,
+                            "export":  1,
+                            "print":  1,
+                            "read":  1,
+                            "report":  1,
+                            "role":  "Hub Staff",
+                            "select":  1,
+                            "share":  0,
+                            "write":  1
+                        },
+                        {
+                            "amend":  0,
+                            "cancel":  0,
+                            "create":  1,
+                            "delete":  1,
+                            "email":  1,
+                            "export":  1,
+                            "print":  1,
+                            "read":  1,
+                            "report":  1,
+                            "role":  "Hub Manager",
+                            "select":  1,
+                            "share":  1,
+                            "write":  1
+                        },
+                        {
+                            "amend":  0,
+                            "cancel":  0,
+                            "create":  1,
+                            "delete":  1,
+                            "email":  1,
+                            "export":  1,
+                            "print":  1,
+                            "read":  1,
+                            "report":  1,
+                            "role":  "System Manager",
+                            "select":  1,
+                            "share":  1,
+                            "write":  1
+                        }
+                    ],
+    "search_fields":  "customer, document_type, status",
+    "sort_field":  "modified",
+    "sort_order":  "DESC",
+    "title_field":  "customer",
+    "track_changes":  1
+}

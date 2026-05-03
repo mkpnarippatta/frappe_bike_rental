@@ -1,0 +1,76 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+    .filter-tab {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 9999px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        background: #f3f4f6;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .filter-tab.active {
+        background: #00A040;
+        color: white;
+    }
+    .filter-tab:hover { opacity: 0.8; }
+</style>
+
+<div style="max-width: 900px; margin: 0 auto; padding: 32px 16px;">
+    <h1 style="margin: 0 0 4px 0; font-size: 22px;">My Bookings</h1>
+    {% if customer_name %}
+    <p style="margin: 0 0 24px 0; color: #6b7280;">{{ customer_name }}</p>
+    {% endif %}
+
+    <!-- Status filter tabs -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+        <a href="/my_bookings" class="filter-tab {% if not active_status %}active{% endif %}">All</a>
+        <a href="/my_bookings?status=Active" class="filter-tab {% if active_status == 'Active' %}active{% endif %}">Active</a>
+        <a href="/my_bookings?status=Confirmed" class="filter-tab {% if active_status == 'Confirmed' %}active{% endif %}">Confirmed</a>
+        <a href="/my_bookings?status=Completed" class="filter-tab {% if active_status == 'Completed' %}active{% endif %}">Completed</a>
+        <a href="/my_bookings?status=Cancelled" class="filter-tab {% if active_status == 'Cancelled' %}active{% endif %}">Cancelled</a>
+    </div>
+
+    {% if bookings %}
+    <div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: white;">
+        <table class="table" style="margin: 0;">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Model</th>
+                    <th>Hub</th>
+                    <th>Status</th>
+                    <th>Dates</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td><a href="/my_bookings/booking_detail?name={{ b.name }}">{{ b.name }}</a></td>
+                    <td>{{ b.bike_model }}</td>
+                    <td>{{ b.hub }}</td>
+                    <td>
+                        {% set sc = {"Active": "label-success", "Completed": "label-info", "Confirmed": "label-primary", "Cancelled": "label-danger", "Expired": "label-warning", "Draft": "label-default"} %}
+                        <span class="label {{ sc.get(b.status, 'label-default') }}">{{ b.status }}</span>
+                    </td>
+                    <td style="font-size: 12px;">{{ b.start_date }} → {{ b.end_date }}</td>
+                    <td>₹{{ "%.2f"|format(b.total_amount|float) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 60px; border: 1px solid #e5e7eb; border-radius: 12px; background: white;">
+        <p style="font-size: 16px; color: #6b7280; margin: 0 0 16px 0;">No bookings found</p>
+        <a href="/" style="padding: 10px 24px; background: #00A040; color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">Browse Bikes</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

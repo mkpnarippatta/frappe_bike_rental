@@ -1,0 +1,301 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+    .price-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        background: white;
+    }
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+    }
+    @media (max-width: 640px) {
+        .detail-layout {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto; padding: 24px 16px;">
+
+{% if not bike %}
+<div style="text-align: center; padding: 80px 0;">
+    <h2>Bike Not Found</h2>
+    <p style="color: #6b7280;">The bike model you are looking for does not exist.</p>
+    <a href="/" style="color: #00A040;">Browse available bikes</a>
+</div>
+{% else %}
+
+<div class="detail-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+    <!-- Left: Bike Images & Specs -->
+    <div>
+        <div style="border-radius: 12px; overflow: hidden; margin-bottom: 24px; background: #f9fafb; text-align: center; padding: 60px;">
+            {% if bike.image %}
+            <img src="{{ bike.image }}" alt="{{ bike.name }}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+            {% else %}
+            <span style="font-size: 80px;">🚲</span>
+            {% endif %}
+        </div>
+
+        <h2 style="margin: 0 0 4px 0;">{{ bike.name }}</h2>
+        <p style="margin: 0 0 16px 0; color: #6b7280;">{{ bike.brand or '' }}</p>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+            {% if bike.category %}
+            <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; background: #f3f4f6;">{{ bike.category }}</span>
+            {% endif %}
+            <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; background: #f3f4f6;">{{ bike.total_serials }} in fleet</span>
+        </div>
+
+        {% if bike.description %}
+        <div style="margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0;">Description</h4>
+            <p style="color: #4b5563; line-height: 1.6;">{{ bike.description }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Available Hubs -->
+        <div>
+            <h4 style="margin: 0 0 8px 0;">Available at</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for hub in bike.hubs %}
+                <li style="padding: 4px 0; color: #4b5563;">📍 {{ hub.hub }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right: Booking Widget -->
+    <div>
+        <div class="price-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <span style="font-size: 28px; font-weight: 700; color: #00A040;">₹{{ "%.0f"|format(bike.base_rate_daily|float) }}</span>
+                    <span style="color: #6b7280;"> /day</span>
+                </div>
+                <div id="availability-badge" style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; background: #f3f4f6; color: #6b7280;">
+                    Check dates
+                </div>
+            </div>
+
+            <!-- Date Selection -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Pickup Date & Time</label>
+                <input type="datetime-local" id="start-datetime" class="form-control"
+                       style="width: 100%;" min="">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Return Date & Time</label>
+                <input type="datetime-local" id="end-datetime" class="form-control"
+                       style="width: 100%;" min="">
+            </div>
+
+            <!-- Hub Selection -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Pickup Hub</label>
+                <select id="hub-select" class="form-control" style="width: 100%;">
+                    {% for hub in bike.hubs %}
+                    <option value="{{ hub.hub }}">{{ hub.hub }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div id="price-breakdown" style="display: none; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 14px;">Price Breakdown</h4>
+                <div class="price-row">
+                    <span style="color: #6b7280;">Daily Rate × <span id="price-days">0</span> day(s)</span>
+                    <span id="price-base">₹0.00</span>
+                </div>
+                <div class="price-row">
+                    <span style="color: #6b7280;">Security Deposit</span>
+                    <span id="price-deposit">₹0.00</span>
+                </div>
+                <div class="price-row" style="font-weight: 700; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+                    <span>Total Due</span>
+                    <span id="price-total" style="color: #00A040;">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Availability Message -->
+            <div id="availability-msg" style="display: none; margin-bottom: 16px; padding: 12px; border-radius: 8px; font-size: 13px;"></div>
+
+            <!-- Book Now Button -->
+            <button id="book-now-btn" class="btn btn-primary"
+                    style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600; background: #00A040; border: none; border-radius: 8px; color: white; cursor: pointer;"
+                    disabled>
+                Select dates to continue
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+</div>
+
+<script>
+    var bikeData = {{ bike_json }};
+
+    function roundToNext30Min(d) {
+        var ms = 30 * 60 * 1000;
+        return new Date(Math.ceil(d.getTime() / ms) * ms);
+    }
+
+    function toLocalDatetimeValue(d) {
+        var y = d.getFullYear();
+        var mo = ("0" + (d.getMonth() + 1)).slice(-2);
+        var da = ("0" + d.getDate()).slice(-2);
+        var h = ("0" + d.getHours()).slice(-2);
+        var mi = ("0" + d.getMinutes()).slice(-2);
+        return y + "-" + mo + "-" + da + "T" + h + ":" + mi;
+    }
+
+    function clampToFuture(input) {
+        var minVal = toLocalDatetimeValue(roundToNext30Min(new Date()));
+        input.min = minVal;
+        if (input.value && input.value < minVal) {
+            input.value = minVal;
+        }
+    }
+
+    // Set defaults: now (rounded up) and tomorrow
+    var now = new Date();
+    var startDefault = roundToNext30Min(now);
+    var tomorrow = new Date(startDefault);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    var startInput = document.getElementById("start-datetime");
+    var endInput = document.getElementById("end-datetime");
+
+    // Pre-fill from URL params (passed from homepage) FIRST
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlStart = urlParams.get("start");
+    var urlEnd = urlParams.get("end");
+    var urlHub = urlParams.get("hub");
+    if (urlStart) startInput.value = urlStart;
+    if (urlEnd) endInput.value = urlEnd;
+    if (urlHub) document.getElementById("hub-select").value = urlHub;
+
+    // Fallback defaults if URL didn't provide values
+    if (!startInput.value) startInput.value = toLocalDatetimeValue(startDefault);
+    if (!endInput.value) endInput.value = toLocalDatetimeValue(tomorrow);
+
+    // Set min AFTER value — prevents browser rejecting the URL value
+    startInput.min = startInput.value;
+    endInput.min = startInput.value;
+
+    // Always run availability check — inputs have values from URL or defaults
+    if (startInput.value && endInput.value) checkAvailability();
+
+    // Validate on change
+    startInput.addEventListener("change", function () {
+        clampToFuture(this);
+        endInput.min = this.value;
+        if (endInput.value && endInput.value <= this.value) {
+            endInput.value = "";
+        }
+        checkAvailability();
+    });
+    endInput.addEventListener("change", function () {
+        clampToFuture(this);
+        checkAvailability();
+    });
+
+    document.getElementById("hub-select").addEventListener("change", function () {
+        checkAvailability();
+    });
+
+    function checkAvailability() {
+        var start = startInput.value;
+        var end = endInput.value;
+        var hub = document.getElementById("hub-select").value;
+        var btn = document.getElementById("book-now-btn");
+        var msg = document.getElementById("availability-msg");
+        var badge = document.getElementById("availability-badge");
+
+        if (!start || !end) {
+            btn.disabled = true;
+            btn.textContent = "Select dates to continue";
+            document.getElementById("price-breakdown").style.display = "none";
+            msg.style.display = "none";
+            return;
+        }
+
+        // Validate minimum 24h
+        var s = new Date(start);
+        var e = new Date(end);
+        var diff = (e - s) / (1000 * 60 * 60 * 24);
+        if (diff < 1) {
+            btn.disabled = true;
+            btn.textContent = "Minimum rental is 24 hours";
+            document.getElementById("price-breakdown").style.display = "none";
+            msg.style.display = "none";
+            return;
+        }
+
+        // Calculate price
+        fetch("/api/method/bike_rental.www.bikes.index.calculate_price?" + new URLSearchParams({
+            model_name: bikeData.name,
+            start_date: start,
+            end_date: end
+        })).then(function(r) { return r.json(); }).then(function(pr) {
+            if (pr.message) {
+                var p = pr.message;
+                document.getElementById("price-days").textContent = p.days;
+                document.getElementById("price-base").textContent = "₹" + p.base_amount.toFixed(2);
+                document.getElementById("price-deposit").textContent = "₹" + p.deposit.toFixed(2);
+                document.getElementById("price-total").textContent = "₹" + p.total_due.toFixed(2);
+                document.getElementById("price-breakdown").style.display = "block";
+            }
+        });
+
+        // Check availability
+        fetch("/api/method/bike_rental.api.availability.check_availability?" + new URLSearchParams({
+            hub: hub,
+            model: bikeData.name,
+            start_datetime: start,
+            end_datetime: end
+        })).then(function(r) { return r.json(); }).catch(function() { return { message: { available: 0 } }; }).then(function(r) {
+            var available = r.message && r.message.available > 0;
+            if (available) {
+                badge.style.background = "#d1fae5";
+                badge.style.color = "#065f46";
+                badge.textContent = r.message.available + " Available";
+                msg.style.display = "none";
+                btn.disabled = false;
+                btn.textContent = "Book Now — Proceed to checkout";
+            } else {
+                badge.style.background = "#fef3c7";
+                badge.style.color = "#92400e";
+                badge.textContent = "Sold Out";
+                msg.style.display = "block";
+                msg.style.background = "#fef3c7";
+                msg.style.color = "#92400e";
+                msg.textContent = "Sorry, this model is not available for the selected dates. Try different dates or hub.";
+                btn.disabled = true;
+                btn.textContent = "Not Available";
+            }
+        });
+    }
+
+    // Navigate to checkout on Book Now click
+    document.getElementById("book-now-btn").addEventListener("click", function () {
+        var start = startInput.value;
+        var end = endInput.value;
+        var hub = document.getElementById("hub-select").value;
+        if (start && end && hub) {
+            var params = new URLSearchParams({
+                model: bikeData.name,
+                start: start,
+                end: end,
+                hub: hub,
+            });
+            window.location.href = "/checkout?" + params.toString();
+        }
+    });
+</script>
+{% endblock %}

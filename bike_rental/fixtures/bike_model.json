@@ -1,0 +1,44 @@
+[
+    {
+        "name": "City Cruiser",
+        "model_name": "City Cruiser",
+        "brand": "Cannondale",
+        "category": "City",
+        "base_rate_hourly": 5.00,
+        "base_rate_daily": 25.00,
+        "safety_margin": 1,
+        "service_interval_km": 1000,
+        "engine_cc": 0,
+        "description": "Lightweight commuter bike perfect for city rides",
+        "disabled": 0,
+        "doctype": "Bike Model"
+    },
+    {
+        "name": "Mountain Explorer",
+        "model_name": "Mountain Explorer",
+        "brand": "Trek",
+        "category": "Off-road",
+        "base_rate_hourly": 8.00,
+        "base_rate_daily": 40.00,
+        "safety_margin": 1,
+        "service_interval_km": 800,
+        "engine_cc": 0,
+        "description": "Full-suspension mountain bike for off-road adventures",
+        "disabled": 0,
+        "doctype": "Bike Model"
+    },
+    {
+        "name": "Electric Glide",
+        "model_name": "Electric Glide",
+        "brand": "Specialized",
+        "category": "Electric",
+        "base_rate_hourly": 12.00,
+        "base_rate_daily": 60.00,
+        "safety_margin": 2,
+        "service_interval_km": 1500,
+        "engine_cc": 250,
+        "description": "Electric assist bike with 80km range",
+        "disabled": 0,
+        "doctype": "Bike Model"
+    }
+]

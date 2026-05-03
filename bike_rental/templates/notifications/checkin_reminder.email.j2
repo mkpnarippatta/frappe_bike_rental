@@ -1,0 +1,9 @@
+subject: Return Reminder — {{ booking_id }}
+<h2>Time to Return Your Bike</h2>
+<p>Hi {{ customer_name }},</p>
+<p>Your rental at <strong>{{ hub_name }}</strong> is due shortly.</p>
+<table>
+  <tr><td><strong>Booking ID:</strong></td><td>{{ booking_id }}</td></tr>
+  <tr><td><strong>End Time:</strong></td><td>{{ end_date }} {{ end_time }}</td></tr>
+</table>
+<p>Please return the bike to {{ hub_name }} on time to avoid late fees. Late returns beyond 1 hour will incur additional charges.</p>

@@ -1,0 +1,11 @@
+subject: Maintenance Alert — {{ serial_no }}
+<h2>Bike Maintenance Required</h2>
+<p>Dear Staff,</p>
+<p>Bike <strong>{{ serial_no }}</strong> ({{ model_name }}) at <strong>{{ hub_name }}</strong> has reached a maintenance threshold.</p>
+<table>
+  <tr><td><strong>Serial No:</strong></td><td>{{ serial_no }}</td></tr>
+  <tr><td><strong>Model:</strong></td><td>{{ model_name }}</td></tr>
+  <tr><td><strong>Current KM:</strong></td><td>{{ km_reading }}</td></tr>
+  <tr><td><strong>Threshold:</strong></td><td>{{ threshold }} KM</td></tr>
+</table>
+<p>Please schedule maintenance as soon as possible.</p>

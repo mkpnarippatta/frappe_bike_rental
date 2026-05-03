@@ -1,0 +1,337 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 0 16px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-size: 24px; margin: 0 0 8px 0;">Welcome Back</h1>
+        <p style="color: #6b7280; margin: 0;">Log in to your Bike Rental account</p>
+    </div>
+
+    <!-- Tab Switcher -->
+    <div style="display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 24px;">
+        <button id="tab-customer" onclick="switchTab('customer')"
+                style="flex: 1; padding: 10px; border: none; background: none; font-size: 14px; font-weight: 600; cursor: pointer; color: #00A040; border-bottom: 2px solid #00A040; margin-bottom: -2px;">
+            Customer
+        </button>
+        <button id="tab-staff" onclick="switchTab('staff')"
+                style="flex: 1; padding: 10px; border: none; background: none; font-size: 14px; font-weight: 600; cursor: pointer; color: #9ca3af; border-bottom: 2px solid transparent; margin-bottom: -2px;">
+            Staff
+        </button>
+    </div>
+
+    <div id="login-error" style="display: none; padding: 12px; background: #fef2f2; color: #991b1b; border-radius: 8px; margin-bottom: 16px; font-size: 13px;"></div>
+
+    {% if developer_mode %}
+    <div id="dev-otp-bar" style="display: none; padding: 12px; background: #fef3c7; color: #92400e; border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 500;"></div>
+    {% endif %}
+
+    <!-- ========== CUSTOMER LOGIN (OTP) ========== -->
+    <div id="customer-login">
+        <!-- Step 1: Mobile Number Entry -->
+        <div id="step-mobile">
+            <form id="mobile-form" onsubmit="return handleSendOTP(event)">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Mobile Number</label>
+                    <input type="tel" id="login-mobile" class="form-control" required
+                           placeholder="+1234567890" style="width: 100%;">
+                </div>
+                <button type="submit" id="send-otp-btn" class="btn btn-primary"
+                        style="width: 100%; padding: 12px; background: #00A040; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
+                    Send OTP
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="font-size: 13px; color: #6b7280;">
+                    Don't have an account?
+                    <a href="/register" style="color: #00A040; font-weight: 500;">Sign up</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 2: OTP Entry -->
+        <div id="step-otp" style="display: none;">
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 20px; text-align: center;">
+                Enter the OTP sent to <strong id="otp-mobile-display"></strong>
+            </p>
+            <form id="otp-form" onsubmit="return handleVerifyOTP(event)">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">OTP</label>
+                    <input type="text" id="login-otp" class="form-control" required
+                           inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                           placeholder="Enter 6-digit OTP" style="width: 100%; font-size: 20px; letter-spacing: 8px; text-align: center;">
+                </div>
+                <button type="submit" id="verify-otp-btn" class="btn btn-primary"
+                        style="width: 100%; padding: 12px; background: #00A040; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
+                    Verify OTP
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 16px;">
+                <p style="font-size: 13px; color: #6b7280;">
+                    Didn't receive OTP?
+                    <a href="#" id="resend-otp-link" onclick="handleResendOTP(event)"
+                       style="color: #00A040; font-weight: 500;">Resend OTP</a>
+                    <span id="resend-timer" style="color: #9ca3af; display: none;"></span>
+                </p>
+                <p style="font-size: 13px; margin-top: 8px;">
+                    <a href="#" onclick="showMobileStep(event)" style="color: #6b7280;">Change mobile number</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== STAFF LOGIN (Email + Password) ========== -->
+    <div id="staff-login" style="display: none;">
+        <form id="staff-form" onsubmit="return handleStaffLogin(event)">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Email / Username</label>
+                <input type="text" id="staff-email" class="form-control" required
+                       placeholder="you@example.com" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #374151;">Password</label>
+                <input type="password" id="staff-password" class="form-control" required
+                       style="width: 100%;">
+            </div>
+            <button type="submit" id="staff-login-btn" class="btn btn-primary"
+                    style="width: 100%; padding: 12px; background: #00A040; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
+                Log In
+            </button>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="font-size: 13px; color: #6b7280;">
+                    <a href="/login#forgot" style="color: #00A040; font-weight: 500;">Forgot password?</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+var redirectTo = new URLSearchParams(window.location.search).get("redirect_to") || "";
+
+// ── Tab Switcher ──
+
+function switchTab(tab) {
+    var custTab = document.getElementById("tab-customer");
+    var staffTab = document.getElementById("tab-staff");
+    var custPanel = document.getElementById("customer-login");
+    var staffPanel = document.getElementById("staff-login");
+    var errEl = document.getElementById("login-error");
+    errEl.style.display = "none";
+
+    if (tab === "customer") {
+        custTab.style.color = "#00A040";
+        custTab.style.borderBottom = "2px solid #00A040";
+        staffTab.style.color = "#9ca3af";
+        staffTab.style.borderBottom = "2px solid transparent";
+        custPanel.style.display = "block";
+        staffPanel.style.display = "none";
+    } else {
+        staffTab.style.color = "#00A040";
+        staffTab.style.borderBottom = "2px solid #00A040";
+        custTab.style.color = "#9ca3af";
+        custTab.style.borderBottom = "2px solid transparent";
+        staffPanel.style.display = "block";
+        custPanel.style.display = "none";
+    }
+}
+
+var currentMobile = "";
+
+function showError(msg) {
+    var el = document.getElementById("login-error");
+    el.innerHTML = msg;
+    el.style.display = "block";
+}
+
+function hideError() {
+    document.getElementById("login-error").style.display = "none";
+}
+
+function showDevOTP(otp) {
+    var el = document.getElementById("dev-otp-bar");
+    if (el) {
+        el.textContent = "DEV MODE: Your OTP is " + otp;
+        el.style.display = "block";
+    }
+}
+
+// ── Staff Login ──
+
+function handleStaffLogin(e) {
+    e.preventDefault();
+    hideError();
+
+    var email = document.getElementById("staff-email").value.trim();
+    var pwd = document.getElementById("staff-password").value;
+    var btn = document.getElementById("staff-login-btn");
+    btn.disabled = true;
+    btn.textContent = "Logging in...";
+
+    frappe.call({
+        method: "login",
+        args: { usr: email, pwd: pwd },
+        callback: function (r) {
+            if (r.home_page) {
+                window.location.href = r.home_page;
+            } else {
+                window.location.href = "/profile";
+            }
+        },
+        error: function (r) {
+            showError("Invalid email or password. Please try again.");
+        },
+        always: function () {
+            btn.disabled = false;
+            btn.textContent = "Log In";
+        },
+    });
+    return false;
+}
+
+// ── Customer OTP: Send ──
+
+function handleSendOTP(e) {
+    e.preventDefault();
+    hideError();
+
+    var mobile = document.getElementById("login-mobile").value.trim();
+    if (!mobile) return false;
+
+    var btn = document.getElementById("send-otp-btn");
+    btn.disabled = true;
+    btn.textContent = "Sending OTP...";
+
+    frappe.call({
+        method: "bike_rental.auth.send_login_otp",
+        args: { mobile: mobile },
+        callback: function (r) {
+            if (r.message) {
+                if (r.message.status === "sent") {
+                    currentMobile = mobile;
+                    document.getElementById("otp-mobile-display").textContent = mobile;
+                    document.getElementById("step-mobile").style.display = "none";
+                    document.getElementById("step-otp").style.display = "block";
+                    startResendTimer(30);
+                    if (r.message._dev_otp) {
+                        showDevOTP(r.message._dev_otp);
+                    }
+                } else if (r.message.status === "rate_limited") {
+                    showError("Too many requests. Please try again later.");
+                }
+            }
+        },
+        error: function (r) {
+            var msg = "Failed to send OTP. Please try again.";
+            if (r._server_messages) {
+                msg = JSON.parse(r._server_messages).join(" ");
+            }
+            showError(msg);
+        },
+        always: function () {
+            btn.disabled = false;
+            btn.textContent = "Send OTP";
+        },
+    });
+    return false;
+}
+
+// ── Customer OTP: Verify ──
+
+function handleVerifyOTP(e) {
+    e.preventDefault();
+    hideError();
+
+    var otp = document.getElementById("login-otp").value.trim();
+    if (!otp || otp.length !== 6) {
+        showError("Please enter a valid 6-digit OTP.");
+        return false;
+    }
+
+    var btn = document.getElementById("verify-otp-btn");
+    btn.disabled = true;
+    btn.textContent = "Verifying...";
+
+    frappe.call({
+        method: "bike_rental.auth.verify_login_otp",
+        args: { mobile: currentMobile, otp: otp, redirect_to: redirectTo },
+        callback: function (r) {
+            if (r.message && r.message.status === "success") {
+                window.location.href = r.message.redirect || "/profile";
+            } else if (r.message && r.message.status === "new_user") {
+                window.location.href = r.message.redirect;
+            }
+        },
+        error: function (r) {
+            var msg = "Invalid OTP. Please try again.";
+            if (r._server_messages) {
+                msg = JSON.parse(r._server_messages).join(" ");
+            }
+            showError(msg);
+            document.getElementById("login-otp").value = "";
+        },
+        always: function () {
+            btn.disabled = false;
+            btn.textContent = "Verify OTP";
+        },
+    });
+    return false;
+}
+
+// ── Resend OTP ──
+
+function handleResendOTP(e) {
+    e.preventDefault();
+
+    var link = document.getElementById("resend-otp-link");
+    link.style.display = "none";
+
+    frappe.call({
+        method: "bike_rental.auth.resend_otp",
+        args: { mobile: currentMobile },
+        callback: function (r) {
+            if (r.message && r.message._dev_otp) {
+                showDevOTP(r.message._dev_otp);
+            }
+        },
+        error: function (r) {
+            showError("Failed to resend OTP.");
+        },
+        always: function () {
+            startResendTimer(30);
+        },
+    });
+}
+
+function startResendTimer(seconds) {
+    var link = document.getElementById("resend-otp-link");
+    var timer = document.getElementById("resend-timer");
+    link.style.display = "none";
+    timer.style.display = "inline";
+
+    function tick() {
+        timer.textContent = "Resend in " + seconds + "s";
+        seconds--;
+        if (seconds < 0) {
+            link.style.display = "inline";
+            timer.style.display = "none";
+        } else {
+            setTimeout(tick, 1000);
+        }
+    }
+    tick();
+}
+
+// ── Back to mobile step ──
+
+function showMobileStep(e) {
+    if (e) e.preventDefault();
+    document.getElementById("step-otp").style.display = "none";
+    document.getElementById("step-mobile").style.display = "block";
+    document.getElementById("login-otp").value = "";
+    hideError();
+}
+</script>
+{% endblock %}
