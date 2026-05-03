@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bike_rental"
+version = "0.0.1"
+description = "Bike rental management system for multi-hub operators"
+authors = [
+    {name = "Ali", email = "admin@example.com"},
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "frappe",
+]
+
+[project.urls]
+Repository = "https://github.com/mkpnarippatta/frappe_bike_rental"
+
+[tool.bench]
+app-type = "frappe"
