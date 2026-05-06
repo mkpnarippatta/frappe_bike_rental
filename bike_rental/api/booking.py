@@ -69,6 +69,9 @@ def process_payment(booking_name, amount, payment_method="Cash"):
     # Transaction safety
     pe_name = None
     try:
+        # Bypass permission checks for customer-facing booking flow
+        booking.flags.ignore_permissions = True
+
         # Create Payment Entry if ERPNext is installed
         if frappe.db.exists("DocType", "Payment Entry"):
             pe = frappe.get_doc({
@@ -83,6 +86,7 @@ def process_payment(booking_name, amount, payment_method="Cash"):
                 "mode_of_payment": payment_method,
             })
             pe.insert(ignore_permissions=True)
+            pe.flags.ignore_permissions = True
             pe.submit()
             pe_name = pe.name
 
