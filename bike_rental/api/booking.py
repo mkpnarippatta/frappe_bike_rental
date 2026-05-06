@@ -116,8 +116,8 @@ def get_customer_bookings(customer_name, status=None):
     return frappe.get_all(
         "Rental Booking",
         filters=filters,
-        fields=["name", "bike_model", "hub", "status", "start_date",
-                "end_date", "total_amount", "creation"],
+        fields=["name", "bike_model", "pickup_hub", "status", "pickup_datetime",
+                "return_datetime", "total_amount", "creation"],
         order_by="creation desc",
     )
 
@@ -152,4 +152,16 @@ def get_booking_detail(booking_name):
     if not booking:
         frappe.throw(_("Booking not found"))
 
-    return booking[0]
+    result = booking[0]
+
+    # Fetch payment info
+    if result.get("payment_entry"):
+        payment = frappe.db.get_value(
+            "Payment Entry",
+            result["payment_entry"],
+            ["name", "paid_amount", "mode_of_payment", "posting_date"],
+            as_dict=True,
+        )
+        result["payment"] = payment
+
+    return result
