@@ -10,6 +10,7 @@
   "location",
   "operating_hours_start",
   "operating_hours_end",
+  "payment_methods",
   "disabled"
  ],
  "fields": [
@@ -37,6 +38,13 @@
    "fieldtype": "Time",
    "label": "Operating Hours End",
    "reqd": 1
+  },
+  {
+   "fieldname": "payment_methods",
+   "fieldtype": "MultiSelect",
+   "label": "Accepted Payment Methods",
+   "options": "Cash\nCard\nUPI\nOnline",
+   "default": "Cash\nCard\nUPI"
   },
   {
    "fieldname": "disabled",
