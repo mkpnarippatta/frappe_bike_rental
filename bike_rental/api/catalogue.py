@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import frappe
+from frappe import _
 
 
 @frappe.whitelist(allow_guest=True)
@@ -49,6 +50,46 @@ def get_catalogue_data(hub):
         })
 
     return {"models": result, "hub": hub}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_bike_detail(model_name):
+    """Return bike detail data."""
+    bike = frappe.get_all(
+        "Bike Model",
+        filters={"name": model_name},
+        fields=["name", "brand", "category", "base_rate_daily", "safety_margin",
+                "description", "image"],
+        limit=1,
+    )
+
+    if not bike:
+        frappe.throw(_("Bike model not found"))
+
+    bike = bike[0]
+
+    total_serials = frappe.db.count(
+        "Bike Serial",
+        filters={"bike_model": bike.name, "status": ["!=", "Scrapped"]},
+    )
+
+    hubs = frappe.db.sql("""
+        SELECT DISTINCT bs.hub
+        FROM `tabBike Serial` bs
+        WHERE bs.bike_model = %s AND bs.status != 'Scrapped'
+        ORDER BY bs.hub
+    """, bike.name, as_dict=True)
+
+    return {
+        "name": bike.name,
+        "brand": bike.brand,
+        "category": bike.category,
+        "base_rate_daily": bike.base_rate_daily,
+        "description": bike.description,
+        "image": bike.image,
+        "total_serials": total_serials,
+        "hubs": [h["hub"] for h in hubs],
+    }
 
 
 @frappe.whitelist()

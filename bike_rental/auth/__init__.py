@@ -217,3 +217,58 @@ def resend_otp(mobile):
         frappe.db.set_value("OTP Request", req.name, "expires_at", now_datetime())
 
     return send_login_otp(mobile)
+
+
+@frappe.whitelist(allow_guest=True)
+def login_email(user, password):
+    """Email/password login for staff users."""
+    from frappe.auth import LoginManager
+    lm = LoginManager()
+    lm.authenticate(user=user, pwd=password)
+    lm.post_login()
+    return {
+        "status": "success",
+        "user": frappe.session.user,
+        "roles": frappe.get_roles(),
+    }
+
+
+@frappe.whitelist()
+def get_current_user():
+    """Return authenticated user info. Used by SPA to check login state on mount.
+
+    Returns profile data including customer info and roles.
+    Returns {"user": "Guest"} if not logged in.
+    """
+    user = frappe.session.user
+
+    if user == "Guest":
+        return {"user": "Guest", "is_authenticated": False}
+
+    roles = frappe.get_roles()
+    is_staff = "System Manager" in roles or "Hub Manager" in roles or "Hub Staff" in roles
+
+    # Look up linked Customer record
+    customer = frappe.db.get_value(
+        "Customer",
+        {"email": user},
+        ["name", "customer_name", "kyc_status", "phone"],
+        as_dict=True,
+    )
+
+    result = {
+        "user": user,
+        "is_authenticated": True,
+        "is_staff": is_staff,
+        "roles": roles,
+    }
+
+    if customer:
+        result["customer"] = {
+            "name": customer.name,
+            "customer_name": customer.customer_name,
+            "kyc_status": customer.kyc_status or "Unverified",
+            "phone": customer.phone,
+        }
+
+    return result

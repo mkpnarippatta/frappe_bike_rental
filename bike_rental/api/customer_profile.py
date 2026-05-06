@@ -147,6 +147,100 @@ def update_customer_profile(customer_name, updates=None):
     }
 
 
+@frappe.whitelist()
+def get_dashboard_summary():
+    """Return customer dashboard summary (active booking, recent bookings, KYC status).
+
+    Uses the currently logged-in user's customer record.
+    """
+    if frappe.session.user == "Guest":
+        frappe.throw(_("Please log in first"))
+
+    customer = frappe.db.get_value(
+        "Customer",
+        {"email": frappe.session.user},
+        ["name", "customer_name", "kyc_status", "phone", "email"],
+        as_dict=True,
+    )
+
+    if not customer:
+        return {
+            "status": "success",
+            "profile": None,
+            "active_booking": None,
+            "recent_bookings": [],
+            "kyc_documents": [],
+        }
+
+    # Active booking
+    active_booking = frappe.get_all(
+        "Rental Booking",
+        filters={"customer": customer.name, "status": "Active", "docstatus": 1},
+        fields=["name", "bike_model", "bike_serial", "hub", "start_date",
+                "end_date", "start_time", "end_time", "total_amount", "creation"],
+        limit=1,
+    )
+    active_booking = active_booking[0] if active_booking else None
+
+    # Recent bookings (excluding active)
+    recent_bookings = frappe.get_all(
+        "Rental Booking",
+        filters={
+            "customer": customer.name,
+            "docstatus": 1,
+            "status": ["!=", "Active"],
+        },
+        fields=["name", "bike_model", "hub", "status", "start_date",
+                "end_date", "total_amount"],
+        order_by="creation desc",
+        limit=5,
+    )
+
+    # KYC document status
+    kyc_docs = frappe.get_all(
+        "KYC Document",
+        filters={"customer": customer.name},
+        fields=["name", "document_type", "status", "creation"],
+        order_by="creation desc",
+        limit=5,
+    )
+
+    return {
+        "status": "success",
+        "profile": {
+            "customer_name": customer.customer_name,
+            "email": customer.email,
+            "phone": customer.phone,
+            "kyc_status": customer.kyc_status or "Unverified",
+        },
+        "active_booking": active_booking,
+        "recent_bookings": recent_bookings,
+        "kyc_documents": kyc_docs,
+    }
+
+
+@frappe.whitelist()
+def update_own_profile(full_name=None, mobile=None):
+    """Update the current user's customer profile fields."""
+    if frappe.session.user == "Guest":
+        frappe.throw(_("Please log in first"))
+
+    customer = frappe.db.get_value(
+        "Customer", {"email": frappe.session.user}, "name"
+    )
+    if not customer:
+        frappe.throw(_("Customer profile not found"))
+
+    if full_name:
+        frappe.db.set_value("Customer", customer, "customer_name", full_name)
+        frappe.db.set_value("User", frappe.session.user, "first_name", full_name)
+
+    if mobile:
+        frappe.db.set_value("Customer", customer, "phone", mobile)
+
+    return {"status": "success", "message": _("Profile updated successfully")}
+
+
 # ── Internal helpers ──
 
 
