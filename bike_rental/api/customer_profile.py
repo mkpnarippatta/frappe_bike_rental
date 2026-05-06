@@ -176,8 +176,8 @@ def get_dashboard_summary():
     active_booking = frappe.get_all(
         "Rental Booking",
         filters={"customer": customer.name, "status": "Active", "docstatus": 1},
-        fields=["name", "bike_model", "bike_serial", "hub", "start_date",
-                "end_date", "start_time", "end_time", "total_amount", "creation"],
+        fields=["name", "bike_model", "pickup_hub", "pickup_datetime",
+                "return_datetime", "total_amount", "creation"],
         limit=1,
     )
     active_booking = active_booking[0] if active_booking else None
@@ -190,8 +190,8 @@ def get_dashboard_summary():
             "docstatus": 1,
             "status": ["!=", "Active"],
         },
-        fields=["name", "bike_model", "hub", "status", "start_date",
-                "end_date", "total_amount"],
+        fields=["name", "bike_model", "pickup_hub", "status", "pickup_datetime",
+                "return_datetime", "total_amount"],
         order_by="creation desc",
         limit=5,
     )
@@ -207,11 +207,13 @@ def get_dashboard_summary():
 
     return {
         "status": "success",
-        "profile": {
+        "user_email": customer.email,
+        "user_name": customer.customer_name,
+        "customer": {
+            "name": customer.name,
             "customer_name": customer.customer_name,
-            "email": customer.email,
-            "phone": customer.phone,
             "kyc_status": customer.kyc_status or "Unverified",
+            "phone": customer.phone,
         },
         "active_booking": active_booking,
         "recent_bookings": recent_bookings,

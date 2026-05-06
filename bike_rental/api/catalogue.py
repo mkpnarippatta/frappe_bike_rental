@@ -92,7 +92,7 @@ def get_bike_detail(model_name):
     }
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_hubs_list():
     """Return list of hubs."""
     return frappe.get_all("Hub", fields=["name"], order_by="name asc")
