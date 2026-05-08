@@ -11,13 +11,13 @@ def get_bookings(hub=None, status=None, date_from=None, date_to=None,
     filters = {"docstatus": 1}
 
     if hub:
-        filters["hub"] = hub
+        filters["pickup_hub"] = hub
     if status:
         filters["status"] = status
     if date_from:
-        filters["start_date"] = [">=", date_from]
+        filters["pickup_datetime"] = [">=", date_from]
     if date_to:
-        filters["end_date"] = ["<=", date_to]
+        filters["return_datetime"] = ["<=", date_to]
     if customer:
         filters["customer"] = ["like", "%{0}%".format(customer)]
     if booking_id:
@@ -28,19 +28,19 @@ def get_bookings(hub=None, status=None, date_from=None, date_to=None,
     if "System Manager" not in roles:
         user_hub = _get_user_hub(frappe.session.user)
         if user_hub:
-            filters["hub"] = user_hub
+            filters["pickup_hub"] = user_hub
 
     bookings = frappe.get_all(
         "Rental Booking",
         filters=filters,
         fields=[
             "name", "customer", "customer_name", "bike_model", "bike_serial",
-            "hub", "status", "start_date", "end_date",
-            "start_time", "end_time",
+            "pickup_hub", "return_hub", "status",
+            "pickup_datetime as start_date", "return_datetime as end_date",
             "total_amount", "payment_entry", "deposit_released",
             "creation",
         ],
-        order_by="start_date desc, creation desc",
+        order_by="pickup_datetime desc, creation desc",
         limit=limit,
     )
 
@@ -57,7 +57,7 @@ def get_booking_detail(booking_name):
     booking = frappe.get_doc("Rental Booking", booking_name)
 
     customer = frappe.get_cached_doc("Customer", booking.customer)
-    hub_doc = frappe.get_cached_doc("Hub", booking.hub) if frappe.db.exists("Hub", booking.hub) else None
+    hub_doc = frappe.get_cached_doc("Hub", booking.pickup_hub) if frappe.db.exists("Hub", booking.pickup_hub) else None
 
     return {
         "booking": booking.as_dict(),

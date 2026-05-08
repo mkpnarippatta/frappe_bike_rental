@@ -110,7 +110,7 @@ function load_bookings(page) {
     page.main.find("#bm-empty").hide();
 
     frappe.call({
-        method: "bike_rental.page.booking_management.booking_management.get_bookings",
+        method: "bike_rental.bike_rental.page.booking_management.booking_management.get_bookings",
         args: {
             status: status || undefined,
             date_from: date_from || undefined,
@@ -159,7 +159,7 @@ function render_booking_table(page, bookings) {
             <td><a href="/app/rental-booking/${b.name}">${b.name}</a></td>
             <td><a href="/app/customer/${b.customer}">${b.customer_name || b.customer}</a></td>
             <td>${b.bike_model || "--"}</td>
-            <td>${b.hub}</td>
+            <td>${b.pickup_hub}</td>
             <td><span class="label ${statusClass}">${b.status}</span></td>
             <td>${b.start_date}</td>
             <td>${b.end_date}</td>
@@ -195,7 +195,7 @@ function show_checkout_modal(booking_name, page) {
         },
     ], function (values) {
         frappe.call({
-            method: "bike_rental.page.booking_management.booking_management.process_checkout",
+            method: "bike_rental.bike_rental.page.booking_management.booking_management.process_checkout",
             args: {
                 booking_name: booking_name,
                 serial_no: values.serial_no,
@@ -263,7 +263,7 @@ function show_cancel_modal(booking_name, page) {
         },
     ], function (values) {
         frappe.call({
-            method: "bike_rental.page.booking_management.booking_management.process_cancellation",
+            method: "bike_rental.bike_rental.page.booking_management.booking_management.process_cancellation",
             args: {
                 booking_name: booking_name,
                 reason: values.reason,

@@ -16,6 +16,10 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
     """
     booking = frappe.get_doc("Rental Booking", booking_name)
 
+    # Ensure numeric types
+    end_km = frappe.utils.flt(end_km)
+    damage_amount = frappe.utils.flt(damage_amount)
+
     # Validate booking is Active
     if booking.status != "Active":
         frappe.throw(
@@ -60,6 +64,21 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
     frappe.db.savepoint("before_check_in")
 
     try:
+        # Verify accounting module is available before making any changes
+        if not frappe.db.exists("DocType", "Company"):
+            frappe.throw(
+                _("Accounting module not installed. Cannot generate Sales Invoice. "
+                  "Please install ERPNext or contact your system administrator."),
+                frappe.ValidationError,
+            )
+
+        company = _get_company()
+        if not company:
+            frappe.throw(
+                _("No Company set up. Please create a Company in Accounting > Company first."),
+                frappe.ValidationError,
+            )
+
         # Calculate charges via pricing engine
         charges = calculate_charges(booking, end_km, end_datetime, damage_amount)
 
@@ -75,11 +94,6 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
         booking.db_set("damage_charges", charges["damage_charges"])
 
         # Generate Sales Invoice
-        company = (
-            frappe.defaults.get_user_default("Company")
-            or frappe.db.get_single_value("Global Defaults", "default_company")
-        )
-
         invoice = frappe.get_doc(
             {
                 "doctype": "Sales Invoice",
@@ -126,7 +140,7 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
 
         booking.db_set("deposit_released", 1)
 
-        # Log deposit release info
+        # Log completion info
         deposit_note = _("Check-In completed. Total charges: {0}. Invoice: {1}.").format(
             charges["total"], invoice.name
         )
@@ -152,3 +166,20 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
         "invoice": invoice.name,
         "charges": charges,
     }
+
+
+def _get_company():
+    """Get company for invoice. Falls back to first available Company doctype."""
+    company = frappe.defaults.get_user_default("Company")
+    if company:
+        return company
+    try:
+        company = frappe.db.get_single_value("Global Defaults", "default_company")
+        if company:
+            return company
+    except Exception:
+        pass
+    companies = frappe.get_all("Company", limit=1)
+    if companies:
+        return companies[0].name
+    return None
