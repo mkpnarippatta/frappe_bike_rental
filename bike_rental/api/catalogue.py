@@ -95,10 +95,19 @@ def get_bike_detail(model_name):
 @frappe.whitelist(allow_guest=True)
 def get_hubs_list():
     """Return list of hubs."""
-    hubs = frappe.get_all("Hub", fields=["name", "payment_methods"], order_by="name asc")
-    for h in hubs:
-        if h.payment_methods:
-            h.payment_methods = [m.strip() for m in h.payment_methods.strip().split("\n") if m.strip()]
-        else:
-            h.payment_methods = ["Cash", "Card", "UPI"]
-    return hubs
+    default_methods = ["Cash", "Card", "UPI"]
+
+    try:
+        hubs = frappe.get_all("Hub", fields=["name", "payment_methods"], order_by="name asc")
+        for h in hubs:
+            if h.payment_methods:
+                h.payment_methods = [m.strip() for m in h.payment_methods.strip().split("\n") if m.strip()]
+            else:
+                h.payment_methods = default_methods
+        return hubs
+    except Exception:
+        # Fallback if payment_methods column doesn't exist yet
+        hubs = frappe.get_all("Hub", fields=["name"], order_by="name asc")
+        for h in hubs:
+            h.payment_methods = default_methods
+        return hubs
