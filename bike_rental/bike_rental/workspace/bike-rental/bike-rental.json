@@ -14,7 +14,7 @@
   "hide_custom": 0,
   "public": 1,
   "is_hidden": 0,
-  "content": "[]",
+  "content": "[{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Booking Management\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Rental Booking\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Customer\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Bike Serial\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Maintenance Log\",\"col\":3}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Operations</b></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Operations\",\"col\":4}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Master Data</b></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Master Data\",\"col\":4}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
   "quick_lists": [],
   "custom_blocks": [],
   "roles": [
