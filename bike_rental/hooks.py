@@ -34,7 +34,7 @@ has_permission = {
     "Bike Serial": "bike_rental.api.check_permissions.has_serial_permission",
     "Rental Booking": "bike_rental.api.check_permissions.has_booking_permission",
     "KYC Document": "bike_rental.api.kyc.has_kyc_document_permission",
-    "Customer": "bike_rental.doctype.customer.customer.has_customer_permission",
+    "Customer": "bike_rental.bike_rental.doctype.customer.customer.has_customer_permission",
 }
 
 # Document email digest
