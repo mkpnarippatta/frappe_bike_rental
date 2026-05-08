@@ -19,15 +19,8 @@ class RentalBooking(Document):
     def before_save(self):
         self._validate_transition()
         self._validate_minimum_duration()
-        # Guard against direct status bypass: KYC must be checked when status
-        # changes to Confirmed via save (not just submit), preventing staff
-        # from bypassing KYC by setting status field directly on the form
-        old_doc = self.get_doc_before_save()
-        if old_doc and old_doc.status != "Confirmed" and self.status == "Confirmed":
-            self._validate_kyc_status()
 
     def before_submit(self):
-        self._validate_kyc_status()
         self._re_verify_availability()
         self._validate_payment_entry()
         if self.status != "Confirmed":
