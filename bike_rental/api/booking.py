@@ -74,6 +74,10 @@ def process_payment(booking_name, amount, payment_method="Cash"):
 
         # Create Payment Entry if ERPNext is installed
         if frappe.db.exists("DocType", "Payment Entry"):
+            company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
+            if not company:
+                frappe.throw(_("No Company set up. Please contact administrator."))
+
             pe = frappe.get_doc({
                 "doctype": "Payment Entry",
                 "payment_type": "Receive",
@@ -81,6 +85,8 @@ def process_payment(booking_name, amount, payment_method="Cash"):
                 "party": customer,
                 "paid_amount": paid,
                 "received_amount": paid,
+                "company": company,
+                "target_exchange_rate": 1,
                 "reference_no": booking_name,
                 "reference_date": now_datetime().date(),
                 "mode_of_payment": payment_method,
