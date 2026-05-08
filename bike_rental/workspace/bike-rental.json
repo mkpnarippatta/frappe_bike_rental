@@ -11,12 +11,22 @@
   "indicator_color": "green",
   "restrict_to_domain": null,
   "hide_custom": 0,
-  "public": 0,
+  "public": 1,
   "is_hidden": 0,
   "content": "[]",
   "quick_lists": [],
   "custom_blocks": [],
-  "roles": [],
+  "roles": [
+    {
+      "role": "System Manager"
+    },
+    {
+      "role": "Hub Manager"
+    },
+    {
+      "role": "Hub Staff"
+    }
+  ],
   "links": [
     {
       "name": "g1m4lk08dn",
