@@ -78,6 +78,10 @@ def process_payment(booking_name, amount, payment_method="Cash"):
             if not company:
                 frappe.throw(_("No Company set up. Please contact administrator."))
 
+            default_cash_account = frappe.db.get_value("Company", company, "default_cash_account")
+            if not default_cash_account:
+                frappe.throw(_("No default cash account found for company {0}. Please configure it in accounting settings.").format(company))
+
             pe = frappe.get_doc({
                 "doctype": "Payment Entry",
                 "payment_type": "Receive",
@@ -90,9 +94,13 @@ def process_payment(booking_name, amount, payment_method="Cash"):
                 "reference_no": booking_name,
                 "reference_date": now_datetime().date(),
                 "mode_of_payment": payment_method,
+                "paid_to": default_cash_account,
+                "paid_to_account_currency": frappe.db.get_value("Account", default_cash_account, "account_currency"),
             })
-            pe.insert(ignore_permissions=True)
+            pe.flags.ignore_mandatory = True
+            pe.set_missing_values()
             pe.flags.ignore_permissions = True
+            pe.insert(ignore_permissions=True, ignore_mandatory=True)
             pe.submit()
             pe_name = pe.name
 
