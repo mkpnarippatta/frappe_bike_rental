@@ -134,8 +134,8 @@
    "fieldname": "payment_method",
    "fieldtype": "Select",
    "label": "Payment Method",
-   "options": "Cash\nCard\nUPI\nBank Transfer\nOther",
-   "default": "Cash"
+   "options": "Pay at Hub\nOnline",
+   "default": "Pay at Hub"
   },
   {
    "fieldname": "check_in_section",

@@ -64,56 +64,19 @@ def process_payment(booking_name, amount, payment_method="Cash"):
     if abs(paid - expected) > 0.01:
         frappe.throw(_("Payment amount {0} does not match booking total {1}.").format(paid, expected))
 
-    customer = frappe.db.get_value("Rental Booking", booking_name, "customer")
-
-    # Transaction safety
-    pe_name = None
     try:
-        # Bypass permission checks for customer-facing booking flow
         booking.flags.ignore_permissions = True
-
-        # Submit booking first
         booking.db_set("payment_method", payment_method)
         booking.submit()
-
-        # Create Payment Entry if ERPNext is installed (non-blocking)
-        if frappe.db.exists("DocType", "Payment Entry"):
-            try:
-                company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
-                if company:
-                    pe = frappe.get_doc({
-                        "doctype": "Payment Entry",
-                        "payment_type": "Receive",
-                        "party_type": "Customer",
-                        "party": customer,
-                        "paid_amount": paid,
-                        "received_amount": paid,
-                        "company": company,
-                        "target_exchange_rate": 1,
-                        "reference_no": booking_name,
-                        "reference_date": now_datetime().date(),
-                        "mode_of_payment": payment_method,
-                    })
-                    pe.flags.ignore_mandatory = True
-                    pe.set_missing_values()
-                    pe.flags.ignore_permissions = True
-                    pe.insert(ignore_permissions=True, ignore_mandatory=True)
-                    pe.submit()
-                    pe_name = pe.name
-                    booking.db_set("payment_entry", pe_name)
-            except Exception as pe_err:
-                frappe.log_error(title="Payment Entry Failed", message="Booking {0}: {1}".format(booking_name, str(pe_err)))
-                # Booking is already submitted, payment entry is non-critical
-
     except Exception:
         frappe.db.rollback()
         frappe.throw(_("Payment processing failed. Please try again."))
 
     return {
         "booking_name": booking_name,
-        "payment_entry": pe_name,
         "status": booking.status,
-        "message": _("Payment successful! Booking confirmed."),
+        "payment_method": payment_method,
+        "message": _("Booking confirmed!") if payment_method == "Pay at Hub" else _("Payment successful! Booking confirmed."),
     }
 
 
