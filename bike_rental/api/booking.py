@@ -72,42 +72,39 @@ def process_payment(booking_name, amount, payment_method="Cash"):
         # Bypass permission checks for customer-facing booking flow
         booking.flags.ignore_permissions = True
 
-        # Create Payment Entry if ERPNext is installed
-        if frappe.db.exists("DocType", "Payment Entry"):
-            company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
-            if not company:
-                frappe.throw(_("No Company set up. Please contact administrator."))
-
-            default_cash_account = frappe.db.get_value("Company", company, "default_cash_account")
-            if not default_cash_account:
-                frappe.throw(_("No default cash account found for company {0}. Please configure it in accounting settings.").format(company))
-
-            pe = frappe.get_doc({
-                "doctype": "Payment Entry",
-                "payment_type": "Receive",
-                "party_type": "Customer",
-                "party": customer,
-                "paid_amount": paid,
-                "received_amount": paid,
-                "company": company,
-                "target_exchange_rate": 1,
-                "reference_no": booking_name,
-                "reference_date": now_datetime().date(),
-                "mode_of_payment": payment_method,
-                "paid_to": default_cash_account,
-                "paid_to_account_currency": frappe.db.get_value("Account", default_cash_account, "account_currency"),
-            })
-            pe.flags.ignore_mandatory = True
-            pe.set_missing_values()
-            pe.flags.ignore_permissions = True
-            pe.insert(ignore_permissions=True, ignore_mandatory=True)
-            pe.submit()
-            pe_name = pe.name
-
+        # Submit booking first
         booking.db_set("payment_method", payment_method)
-        if pe_name:
-            booking.db_set("payment_entry", pe_name)
         booking.submit()
+
+        # Create Payment Entry if ERPNext is installed (non-blocking)
+        if frappe.db.exists("DocType", "Payment Entry"):
+            try:
+                company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
+                if company:
+                    pe = frappe.get_doc({
+                        "doctype": "Payment Entry",
+                        "payment_type": "Receive",
+                        "party_type": "Customer",
+                        "party": customer,
+                        "paid_amount": paid,
+                        "received_amount": paid,
+                        "company": company,
+                        "target_exchange_rate": 1,
+                        "reference_no": booking_name,
+                        "reference_date": now_datetime().date(),
+                        "mode_of_payment": payment_method,
+                    })
+                    pe.flags.ignore_mandatory = True
+                    pe.set_missing_values()
+                    pe.flags.ignore_permissions = True
+                    pe.insert(ignore_permissions=True, ignore_mandatory=True)
+                    pe.submit()
+                    pe_name = pe.name
+                    booking.db_set("payment_entry", pe_name)
+            except Exception as pe_err:
+                frappe.log_error(title="Payment Entry Failed", message="Booking {0}: {1}".format(booking_name, str(pe_err)))
+                # Booking is already submitted, payment entry is non-critical
+
     except Exception:
         frappe.db.rollback()
         frappe.throw(_("Payment processing failed. Please try again."))
