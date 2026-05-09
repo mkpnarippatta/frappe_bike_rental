@@ -163,7 +163,7 @@ class RentalBooking(Document):
     def _validate_payment_entry(self):
         if not frappe.db.exists("DocType", "Payment Entry"):
             return
-        if not self.payment_entry:
+        if self.payment_method == "Online" and not self.payment_entry:
             frappe.throw(
                 _("A Payment Entry must be linked before confirming the booking"),
                 frappe.ValidationError,
