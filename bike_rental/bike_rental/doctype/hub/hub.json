@@ -43,8 +43,8 @@
    "fieldname": "payment_methods",
    "fieldtype": "MultiSelect",
    "label": "Accepted Payment Methods",
-   "options": "Cash\nCard\nUPI\nOnline",
-   "default": "Cash\nCard\nUPI"
+   "options": "Pay at Hub\nOnline",
+   "default": "Pay at Hub\nOnline"
   },
   {
    "fieldname": "disabled",

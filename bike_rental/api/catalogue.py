@@ -95,7 +95,7 @@ def get_bike_detail(model_name):
 @frappe.whitelist(allow_guest=True)
 def get_hubs_list():
     """Return list of hubs."""
-    default_methods = ["Cash", "Card", "UPI"]
+    default_methods = ["Pay at Hub", "Online"]
 
     try:
         hubs = frappe.get_all("Hub", fields=["name", "payment_methods"], order_by="name asc")
