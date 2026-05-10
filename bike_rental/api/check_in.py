@@ -131,19 +131,8 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
         serial.db_set("status", "Available")
         serial.db_set("current_km", end_km)
 
-        # Update booking to Completed with optimistic lock
-        rows_affected = frappe.db.set_value(
-            "Rental Booking",
-            booking_name,
-            "status",
-            "Completed",
-            update_modified=True,
-        )
-        if not rows_affected:
-            frappe.throw(
-                _("Booking could not be completed (concurrent update detected)."),
-                frappe.ValidationError,
-            )
+        # Update booking to Completed
+        booking.db_set("status", "Completed")
 
         booking.db_set("deposit_released", 1)
 

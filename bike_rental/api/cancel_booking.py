@@ -89,19 +89,14 @@ def cancel_booking(booking_name, reason=None):
             )
         serial.db_set("status", "Available")
 
-    # Update booking status with optimistic lock
-    rows = frappe.db.set_value(
+    # Update booking status
+    frappe.db.set_value(
         "Rental Booking",
         booking_name,
         "status",
         "Cancelled",
         update_modified=True,
     )
-    if not rows:
-        frappe.throw(
-            _("Booking could not be cancelled (concurrent update detected)."),
-            frappe.ValidationError,
-        )
 
     if reason:
         frappe.db.set_value("Rental Booking", booking_name, "cancellation_reason", reason)
