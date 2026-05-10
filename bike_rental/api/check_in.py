@@ -94,6 +94,10 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
         booking.db_set("damage_charges", charges["damage_charges"])
 
         # Generate Sales Invoice
+        # Ensure tax_id is set to avoid ERPNext fetch_from validation error
+        if booking.customer and not frappe.db.get_value("Customer", booking.customer, "tax_id"):
+            frappe.db.set_value("Customer", booking.customer, "tax_id", "")
+
         invoice = frappe.get_doc(
             {
                 "doctype": "Sales Invoice",
