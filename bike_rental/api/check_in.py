@@ -98,6 +98,9 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
         if booking.customer and not frappe.db.get_value("Customer", booking.customer, "tax_id"):
             frappe.db.set_value("Customer", booking.customer, "tax_id", "")
 
+        # Find rental service item code (try common names, fallback to first service item)
+        item_code = _get_rental_item_code()
+
         invoice = frappe.get_doc(
             {
                 "doctype": "Sales Invoice",
@@ -106,7 +109,7 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
                 "posting_date": frappe.utils.nowdate(),
                 "items": [
                     {
-                        "item_code": "Rental Service",
+                        "item_code": item_code,
                         "item_name": line["description"],
                         "qty": 1,
                         "rate": line["amount"],
@@ -170,6 +173,19 @@ def check_in(booking_name, end_km, end_battery=None, damage_notes=None, damage_a
         "invoice": invoice.name,
         "charges": charges,
     }
+
+
+def _get_rental_item_code():
+    """Find the rental service item code."""
+    for code in ["S-01", "Rental Service", "Bike Rental"]:
+        if frappe.db.exists("Item", code):
+            return code
+    # Fallback: find any item in Services group
+    item = frappe.get_value("Item", {"item_group": "Services"}, "name")
+    if item:
+        return item
+    # Last resort
+    return "S-01"
 
 
 def _get_company():
