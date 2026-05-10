@@ -1,11 +1,6 @@
 from __future__ import unicode_literals
 
 import frappe
-from frappe.model.document import Document
-
-
-class Customer(Document):
-    pass
 
 
 def has_customer_permission(doc, ptype, user):

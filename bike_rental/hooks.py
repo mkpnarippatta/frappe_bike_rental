@@ -34,7 +34,7 @@ has_permission = {
     "Bike Serial": "bike_rental.api.check_permissions.has_serial_permission",
     "Rental Booking": "bike_rental.api.check_permissions.has_booking_permission",
     "KYC Document": "bike_rental.api.kyc.has_kyc_document_permission",
-    "Customer": "bike_rental.bike_rental.doctype.customer.customer.has_customer_permission",
+    "Customer": "bike_rental.api.customer_permissions.has_customer_permission",
 }
 
 # Document email digest
@@ -42,6 +42,36 @@ has_permission = {
 #     "Daily": "1d",
 #     "Weekly": "1w",
 # }
+
+# Custom fields for standard doctypes
+custom_fields = {
+    "Customer": [
+        {
+            "fieldname": "kyc_section",
+            "fieldtype": "Section Break",
+            "label": "KYC Verification",
+            "insert_after": "disabled",
+        },
+        {
+            "fieldname": "kyc_status",
+            "fieldtype": "Select",
+            "label": "KYC Status",
+            "options": "Unverified\nPending Review\nVerified\nRejected",
+            "default": "Unverified",
+            "read_only": 1,
+            "in_list_view": 1,
+            "in_standard_filter": 1,
+            "insert_after": "kyc_section",
+        },
+        {
+            "fieldname": "kyc_completed_date",
+            "fieldtype": "Date",
+            "label": "KYC Completed Date",
+            "read_only": 1,
+            "insert_after": "kyc_status",
+        },
+    ],
+}
 
 # Fixtures — seed data loaded via `bench --site rental.local install-app`
 fixtures = [
